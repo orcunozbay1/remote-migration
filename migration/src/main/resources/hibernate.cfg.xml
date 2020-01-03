@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>      
+  <session-factory>
+    <!-- Database connection settings -->
+    <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+    <property name="connection.driver_class">org.postgresql.Driver</property>
+    <property name="connection.url">jdbc:postgresql://178.242.49.250:15432/remote</property>
+    <property name="connection.username">postgres</property>
+    <property name="connection.password">gala123456</property>
+
+
+    <mapping class="remoteentity.rm_Cfarea" />
+    <mapping class="remoteentity.rm_Cfcompany" />
+    <mapping class="remoteentity.rm_Cfmodel" />
+    <mapping class="remoteentity.rm_Cfpcoweb" />
+    <mapping class="remoteentity.rm_Cfplantdata" />
+    <mapping class="remoteentity.rm_Cfremoteuserlink" />
+    <mapping class="remoteentity.rm_Cfremoteusers" />
+    <mapping class="remoteentity.rm_Cfremoteusersupervisor" />
+    <mapping class="remoteentity.rm_Cfsupervisors" />
+    <mapping class="remoteentity.rm_Lgalarmarrive" />
+    <mapping class="remoteentity.rm_Lgalarmrecall" />
+    <mapping class="remoteentity.rm_Lgalarmreset" />
+    <mapping class="remoteentity.rm_Lgvariable" />
+    <mapping class="remoteentity.rm_Lgdevice" />
+
+
+    <mapping class="remoteentity.scc_Company"/>
+    <mapping class="remoteentity.scc_Controller"/>
+    <mapping class="remoteentity.scc_Site"/>
+    <mapping class="remoteentity.scc_Supervisor"/>
+    <mapping class="remoteentity.scc_Variable"/>
+    <mapping class="remoteentity.scc_MaintenanceArea"/>
+    <mapping class="remoteentity.scc_DeviceModel"/>
+    <mapping class="remoteentity.scc_Description"/>
+
+
+  </session-factory>
+</hibernate-configuration>
