@@ -36,6 +36,7 @@
     <mapping class="remoteentity.scc_MaintenanceArea"/>
     <mapping class="remoteentity.scc_DeviceModel"/>
     <mapping class="remoteentity.scc_Description"/>
+    <mapping class="remoteentity.rm_Cfdevmdl"/>
 
 
   </session-factory>

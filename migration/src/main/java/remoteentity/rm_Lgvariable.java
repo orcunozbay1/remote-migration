@@ -35,7 +35,7 @@ public class rm_Lgvariable {
     private String imageon;
     private String imageoff;
     private Integer frequency;
-    private BigInteger delta;
+    //private BigInteger delta;
     private Integer delay;
     private String isonchange;
     private String ishaccp;
@@ -317,7 +317,7 @@ public class rm_Lgvariable {
         this.frequency = frequency;
     }
 
-    @Basic
+    /*@Basic
     @Column(name = "delta")
     public BigInteger getDelta() {
         return delta;
@@ -325,7 +325,7 @@ public class rm_Lgvariable {
 
     public void setDelta(BigInteger delta) {
         this.delta = delta;
-    }
+    }*/
 
     @Basic
     @Column(name = "delay")
@@ -461,7 +461,7 @@ public class rm_Lgvariable {
         if (imageon != null ? !imageon.equals(that.imageon) : that.imageon != null) return false;
         if (imageoff != null ? !imageoff.equals(that.imageoff) : that.imageoff != null) return false;
         if (frequency != null ? !frequency.equals(that.frequency) : that.frequency != null) return false;
-        if (delta != null ? !delta.equals(that.delta) : that.delta != null) return false;
+       // if (delta != null ? !delta.equals(that.delta) : that.delta != null) return false;
         if (delay != null ? !delay.equals(that.delay) : that.delay != null) return false;
         if (isonchange != null ? !isonchange.equals(that.isonchange) : that.isonchange != null) return false;
         if (ishaccp != null ? !ishaccp.equals(that.ishaccp) : that.ishaccp != null) return false;
@@ -505,7 +505,7 @@ public class rm_Lgvariable {
         result = 31 * result + (imageon != null ? imageon.hashCode() : 0);
         result = 31 * result + (imageoff != null ? imageoff.hashCode() : 0);
         result = 31 * result + (frequency != null ? frequency.hashCode() : 0);
-        result = 31 * result + (delta != null ? delta.hashCode() : 0);
+      //  result = 31 * result + (delta != null ? delta.hashCode() : 0);
         result = 31 * result + (delay != null ? delay.hashCode() : 0);
         result = 31 * result + (isonchange != null ? isonchange.hashCode() : 0);
         result = 31 * result + (ishaccp != null ? ishaccp.hashCode() : 0);

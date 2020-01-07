@@ -10,38 +10,128 @@ public class Starter {
 
     public static void main(String[] args)
     {
-
-        saveDeviceModel();
+        //4443
+        //saveDeviceModel();
+        //saveVariables();
 
         //saveAreas();
+        //test();
+
+
+
+        //saveController();
+
+
+    } //fstaf msfvw
+
+
+    /**
+     * Kendi id'si ile atılıyor
+     */
+    private static void saveDeviceModel()
+    {
+
+        Session session = HibernateConfig.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        try{
+            List<rm_Cfdevmdl> deviceModels=session.createQuery("from rm_Cfdevmdl ").getResultList();
+
+            for(rm_Cfdevmdl rm_device : deviceModels)
+            {
+                scc_DeviceModel deviceModel=new scc_DeviceModel();
+                deviceModel.setId(rm_device.getId());
+                //deviceModel.setProtocol();
+                deviceModel.setLanguage("TR");
+                deviceModel.setDescription(rm_device.getDescription());
+                deviceModel.setManufacturer(rm_device.getManufacturer());
+                //deviceModel.setOrigin(rm_device.);
+                session.save(deviceModel);
+            }
+            transaction.commit();
+
+
+        }
+        catch (Exception ex)
+        {
+            transaction.rollback();
+            ex.printStackTrace();
+        }
+
+
+
+        session.close();
 
     }
 
-    private static void saveDeviceModel()
+
+    /**
+     * Anlık id oluşturuluyor
+     */
+    private static void saveController()
+    {
+        Session session = HibernateConfig.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        try{
+            List<rm_Lgdevice> controllerList = session.createQuery("from rm_Lgdevice dev where dev.isenabled='TRUE' and dev.iddevmdl>0 and dev.iscancelled='FALSE' and lastupdate is not null and iddevice>0").getResultList();
+            int x=1;
+            for(rm_Lgdevice rmDevice : controllerList)
+            {
+                scc_Controller controller = new scc_Controller();
+                controller.setId(x);
+                controller.setDescription(rmDevice.getDescription());
+                controller.setName(rmDevice.getDescription());
+                controller.setDevicemodelId(rmDevice.getIddevmdl());
+                controller.setSupervisorId(rmDevice.getKidsupervisor());
+                controller.setIsactive(true);
+                session.save(controller);
+                x++;
+            }
+
+            transaction.commit();
+
+
+
+        }
+        catch (Exception ex)
+        {
+            transaction.rollback();
+            ex.printStackTrace();
+        }
+
+
+
+        session.close();
+
+    }
+
+
+
+
+
+    private static void test() {
+        Session session = HibernateConfig.getSessionFactory().openSession();
+
+        List<rm_Lgvariable> variableList=session.createQuery("from rm_Lgvariable var where var.kidsupervisor=:supervisor and var.iddevice=:device")
+                .setParameter("supervisor",5678)
+                .setParameter("device",534)
+                .getResultList();
+
+        session.close();
+    }
+
+
+    private static void saveVariables()
     {
         Session session = HibernateConfig.getSessionFactory().openSession();
 
         Transaction transaction = session.beginTransaction();
+        int y=1;
         try {
 
-            List<rm_Lgdevice> deviceList = session.createQuery("from rm_Lgdevice dev where dev.isenabled='TRUE' and dev.iscancelled='FALSE' and lastupdate is not null and iddevice>0").getResultList();
+              List<rm_Lgvariable> variableList=session.createQuery("from rm_Lgvariable var where var.isactive='TRUE' ")
+                .getResultList();
 
-            int x = 1;
 
-            for (rm_Lgdevice rmDevice : deviceList) {
-                scc_DeviceModel sccDevice = new scc_DeviceModel();
-                sccDevice.setId(x);
-                sccDevice.setDescription(rmDevice.getDescription());
-                sccDevice.setLanguage("TR");
-                sccDevice.setProtocol("Modbus");
-                session.save(sccDevice);
-
-                List<rm_Lgvariable> variableList=session.createQuery("from rm_Lgvariable var where var.kidsupervisor=:supervisor and var.iddevice=:device")
-                        .setParameter("supervisor",rmDevice.getKidsupervisor())
-                        .setParameter("device",rmDevice.getIddevice())
-                        .getResultList();
-
-                int y=1;
                 for(rm_Lgvariable rmVariable : variableList)
                 {
                     scc_Variable sccVariable = new scc_Variable();
@@ -50,7 +140,7 @@ public class Starter {
                     //sccVariable.setVariableKey(rmVariable);
 //                    sccVariable.setColor(rmVariable.get);
                     sccVariable.setHaccp(rmVariable.getIshaccp().trim().equals("TRUE"));
-                    sccVariable.setDeviceModelId(sccDevice.getId());
+                    sccVariable.setDeviceModelId(rmVariable.getIddevice());
                     sccVariable.setType(rmVariable.getType());
                     sccVariable.setInaddress(rmVariable.getAddressin());
                     sccVariable.setOutaddress(rmVariable.getAddressout());
@@ -61,13 +151,15 @@ public class Starter {
                     sccVariable.setDecimal(rmVariable.getDecimal().equals(1));
                     sccVariable.setTodisplay(rmVariable.getTodisplay());
                     sccVariable.setPriority(rmVariable.getPriority());
-                    sccVariable.setMinimum(Double.valueOf(rmVariable.getMinvalue()));
-                    sccVariable.setMaximum(Double.valueOf(rmVariable.getMaxvalue()));
-                    sccVariable.setDefaultvalue(Double.valueOf(rmVariable.getDefaultvalue()));
+                    sccVariable.setMinimum(rmVariable.getMinvalue());
+                    sccVariable.setMaximum(rmVariable.getMaxvalue());
+                    if(rmVariable.getDefaultvalue()!=null)
+                        sccVariable.setDefaultvalue(Double.valueOf(rmVariable.getDefaultvalue()));
                     sccVariable.setMeasureunit(rmVariable.getMeasureunit());
                     sccVariable.setImageon(rmVariable.getImageon());
                     sccVariable.setImageoff(rmVariable.getImageoff());
                     sccVariable.setCategory(rmVariable.getGrpcategory());
+
 
                     session.save(sccVariable);
 
@@ -88,15 +180,20 @@ public class Starter {
 
 
 
-                x++;
-            }
 
             transaction.commit();
 
-        }catch (Exception ex)
+        }
+        catch (ArithmeticException ex)
+        {
+            ex.printStackTrace();
+            System.out.println(y);
+        }
+        catch (Exception ex)
         {
             transaction.rollback();
             ex.printStackTrace();
+            System.out.println(y);
 
         }
         session.close();

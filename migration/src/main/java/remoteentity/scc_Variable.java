@@ -67,11 +67,11 @@ public class scc_Variable {
     @Column
     private Double defaultvalue;
     @Column
-    private Double maximum;
+    private String maximum;
     @Column
     private String measureunit;
     @Column
-    private Double minimum;
+    private String minimum;
     @Column
     private boolean signed;
     @Column
@@ -381,11 +381,11 @@ public class scc_Variable {
 
     @Basic
     @Column(name = "maximum")
-    public Double getMaximum() {
+    public String getMaximum() {
         return maximum;
     }
 
-    public void setMaximum(Double maximum) {
+    public void setMaximum(String maximum) {
         this.maximum = maximum;
     }
 
@@ -401,11 +401,11 @@ public class scc_Variable {
 
     @Basic
     @Column(name = "minimum")
-    public Double getMinimum() {
+    public String getMinimum() {
         return minimum;
     }
 
-    public void setMinimum(Double minimum) {
+    public void setMinimum(String minimum) {
         this.minimum = minimum;
     }
 
