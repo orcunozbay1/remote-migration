@@ -6,31 +6,57 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "cfsupervisors", schema = "public", catalog = "remote")
 public class rm_Cfsupervisors {
-    private int id;
-    private String ident;
-    private String ptypeconnection;
-    private String password;
-    private String ipaddress;
-    private Boolean synchconfs;
-    private Boolean synchalarms;
-    private Boolean synchevents;
-    private Boolean synchnotes;
-    private Boolean synchdata;
-    private Timestamp cdate;
-    private Timestamp udate;
-    private String cuser;
-    private String uuser;
-    private String location;
-    private String description;
-    private String macaddress;
-    private Boolean probeissue;
-    private Boolean enableprobe;
-    private String language;
-    private Boolean enableproxy;
-    private Boolean enableheartbeat;
-    private Boolean heartbeatissue;
-
     @Id
+    @GeneratedValue
+    private int id;
+    @Column(name = "ident")
+    private String ident;
+    @Column(name = "ptypeconnection")
+    private String ptypeconnection;
+    @Column(name = "password")
+    private String password;
+    @Column(name = "ipaddress")
+    private String ipaddress;
+    @Column(name = "synchconfs")
+    private Boolean synchconfs;
+    @Column(name = "synchalarms")
+    private Boolean synchalarms;
+    @Column(name = "synchevents")
+    private Boolean synchevents;
+    @Column(name = "synchnotes")
+    private Boolean synchnotes;
+    @Column(name = "synchdata")
+    private Boolean synchdata;
+    @Column(name = "cdate")
+    private Timestamp cdate;
+    @Column(name = "udate")
+    private Timestamp udate;
+    @Column(name = "cuser")
+    private String cuser;
+    @Column(name = "uuser")
+    private String uuser;
+    @Column(name = "location")
+    private String location;
+    @Column(name = "description")
+    private String description;
+    @Column(name = "macaddress")
+    private String macaddress;
+    @Column(name = "probeissue")
+    private Boolean probeissue;
+    @Column(name = "enableprobe")
+    private Boolean enableprobe;
+    @Column(name = "language")
+    private String language;
+    @Column(name = "enableproxy")
+    private Boolean enableproxy;
+    @Column(name = "enableheartbeat")
+    private Boolean enableheartbeat;
+    @Column(name = "heartbeatissue")
+    private Boolean heartbeatissue;
+    @Column
+    private Integer ksite;
+
+
     @Column(name = "id")
     public int getId() {
         return id;
@@ -41,7 +67,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "ident")
+
     public String getIdent() {
         return ident;
     }
@@ -51,7 +77,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "ptypeconnection")
+
     public String getPtypeconnection() {
         return ptypeconnection;
     }
@@ -61,7 +87,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "password")
+
     public String getPassword() {
         return password;
     }
@@ -71,7 +97,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "ipaddress")
+
     public String getIpaddress() {
         return ipaddress;
     }
@@ -81,7 +107,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "synchconfs")
+
     public Boolean getSynchconfs() {
         return synchconfs;
     }
@@ -91,7 +117,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "synchalarms")
+
     public Boolean getSynchalarms() {
         return synchalarms;
     }
@@ -101,7 +127,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "synchevents")
+
     public Boolean getSynchevents() {
         return synchevents;
     }
@@ -111,7 +137,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "synchnotes")
+
     public Boolean getSynchnotes() {
         return synchnotes;
     }
@@ -121,7 +147,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "synchdata")
+
     public Boolean getSynchdata() {
         return synchdata;
     }
@@ -131,7 +157,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "cdate")
+
     public Timestamp getCdate() {
         return cdate;
     }
@@ -141,7 +167,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "udate")
+
     public Timestamp getUdate() {
         return udate;
     }
@@ -151,7 +177,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "cuser")
+
     public String getCuser() {
         return cuser;
     }
@@ -161,7 +187,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "uuser")
+
     public String getUuser() {
         return uuser;
     }
@@ -171,7 +197,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "location")
+
     public String getLocation() {
         return location;
     }
@@ -181,7 +207,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "description")
+
     public String getDescription() {
         return description;
     }
@@ -191,7 +217,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "macaddress")
+
     public String getMacaddress() {
         return macaddress;
     }
@@ -201,7 +227,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "probeissue")
+
     public Boolean getProbeissue() {
         return probeissue;
     }
@@ -211,7 +237,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "enableprobe")
+
     public Boolean getEnableprobe() {
         return enableprobe;
     }
@@ -221,7 +247,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "language")
+
     public String getLanguage() {
         return language;
     }
@@ -231,7 +257,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "enableproxy")
+
     public Boolean getEnableproxy() {
         return enableproxy;
     }
@@ -241,7 +267,7 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "enableheartbeat")
+
     public Boolean getEnableheartbeat() {
         return enableheartbeat;
     }
@@ -251,13 +277,22 @@ public class rm_Cfsupervisors {
     }
 
     @Basic
-    @Column(name = "heartbeatissue")
+
     public Boolean getHeartbeatissue() {
         return heartbeatissue;
     }
 
     public void setHeartbeatissue(Boolean heartbeatissue) {
         this.heartbeatissue = heartbeatissue;
+    }
+
+
+    public Integer getKsite() {
+        return ksite;
+    }
+
+    public void setKsite(Integer ksite) {
+        this.ksite = ksite;
     }
 
     @Override
