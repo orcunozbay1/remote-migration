@@ -1,74 +1,61 @@
 package remoteentity;
 
-import javax.persistence.*;
 import java.sql.Timestamp;
 
-@Entity
-@Table(name = "supervisor", schema = "scc", catalog = "remote")
 public class scc_Supervisor {
-    @Id
     private int id;
-    @Column
+
     private Boolean connection;
-    @Column
+
     private String connectiontype;
-    @Column
+
     private String identifier;
-    @Column(name = "ip_adress")
     private String ipAdress;
-    @Column
+
     private String language;
-    @Column
+
     private String macaddress;
-    @Column
+
     private String password;
-    @Column
+
     private Boolean dataalignment;
-    @Column
+
     private String description;
-    @Column
+
     private Boolean events;
-    @Column
+
     private Timestamp firstsynchronizationdate;
-    @Column(name = "ftp_password")
     private String ftpPassword;
-    @Column(name = "ftp_username")
     private String ftpUsername;
-    @Column
+
     private Boolean healthchecking;
-    @Column(name = "http_password")
     private String httpPassword;
-    @Column(name = "http_username")
     private String httpUsername;
-    @Column
+
     private Boolean isalarm;
-    @Column
+
     private Boolean isdeleted;
-    @Column
+
     private Long lastalignmentdate;
-    @Column
+
     private Long lastmaintenancedate;
-    @Column
+
     private Long lastsynchronizationdate;
-    @Column
+
     private Boolean lifetest;
-    @Column
+
     private Boolean notes;
-    @Column
+
     private String proxyid;
-    @Column
+
     private String softwareversion;
-    @Column
+
     private Boolean synchronization;
-    @Column
+
     private String type;
-    @Column(name = "maintenancearea_id")
     private Integer maintenanceareaId;
-    @Column(name = "site_id")
     private Integer siteId;
 
-    @Basic
-    @Column(name = "id")
     public int getId() {
         return id;
     }
@@ -77,8 +64,6 @@ public class scc_Supervisor {
         this.id = id;
     }
 
-    @Basic
-    @Column(name = "connection")
     public Boolean getConnection() {
         return connection;
     }
@@ -87,8 +72,6 @@ public class scc_Supervisor {
         this.connection = connection;
     }
 
-    @Basic
-    @Column(name = "connectiontype")
     public String getConnectiontype() {
         return connectiontype;
     }
@@ -97,8 +80,6 @@ public class scc_Supervisor {
         this.connectiontype = connectiontype;
     }
 
-    @Basic
-    @Column(name = "identifier")
     public String getIdentifier() {
         return identifier;
     }
@@ -107,8 +88,6 @@ public class scc_Supervisor {
         this.identifier = identifier;
     }
 
-    @Basic
-    @Column(name = "ip_adress")
     public String getIpAdress() {
         return ipAdress;
     }
@@ -117,8 +96,6 @@ public class scc_Supervisor {
         this.ipAdress = ipAdress;
     }
 
-    @Basic
-    @Column(name = "language")
     public String getLanguage() {
         return language;
     }
@@ -127,8 +104,6 @@ public class scc_Supervisor {
         this.language = language;
     }
 
-    @Basic
-    @Column(name = "macaddress")
     public String getMacaddress() {
         return macaddress;
     }
@@ -137,8 +112,6 @@ public class scc_Supervisor {
         this.macaddress = macaddress;
     }
 
-    @Basic
-    @Column(name = "password")
     public String getPassword() {
         return password;
     }
@@ -147,9 +120,6 @@ public class scc_Supervisor {
         this.password = password;
     }
 
-
-    @Basic
-    @Column(name = "dataalignment")
     public Boolean getDataalignment() {
         return dataalignment;
     }
@@ -158,8 +128,6 @@ public class scc_Supervisor {
         this.dataalignment = dataalignment;
     }
 
-    @Basic
-    @Column(name = "description")
     public String getDescription() {
         return description;
     }
@@ -168,8 +136,6 @@ public class scc_Supervisor {
         this.description = description;
     }
 
-    @Basic
-    @Column(name = "events")
     public Boolean getEvents() {
         return events;
     }
@@ -178,8 +144,6 @@ public class scc_Supervisor {
         this.events = events;
     }
 
-    @Basic
-    @Column(name = "firstsynchronizationdate")
     public Timestamp getFirstsynchronizationdate() {
         return firstsynchronizationdate;
     }
@@ -187,8 +151,6 @@ public class scc_Supervisor {
     public void setFirstsynchronizationdate(Timestamp firstsynchronizationdate) {
         this.firstsynchronizationdate = firstsynchronizationdate;
     }
-
-    @Basic
 
     public String getFtpPassword() {
         return ftpPassword;
@@ -198,8 +160,6 @@ public class scc_Supervisor {
         this.ftpPassword = ftpPassword;
     }
 
-    @Basic
-
     public String getFtpUsername() {
         return ftpUsername;
     }
@@ -208,8 +168,6 @@ public class scc_Supervisor {
         this.ftpUsername = ftpUsername;
     }
 
-    @Basic
-    @Column(name = "healthchecking")
     public Boolean getHealthchecking() {
         return healthchecking;
     }
@@ -217,8 +175,6 @@ public class scc_Supervisor {
     public void setHealthchecking(Boolean healthchecking) {
         this.healthchecking = healthchecking;
     }
-
-    @Basic
 
     public String getHttpPassword() {
         return httpPassword;
@@ -228,8 +184,6 @@ public class scc_Supervisor {
         this.httpPassword = httpPassword;
     }
 
-    @Basic
-
     public String getHttpUsername() {
         return httpUsername;
     }
@@ -238,8 +192,6 @@ public class scc_Supervisor {
         this.httpUsername = httpUsername;
     }
 
-    @Basic
-    @Column(name = "isalarm")
     public Boolean getIsalarm() {
         return isalarm;
     }
@@ -248,8 +200,6 @@ public class scc_Supervisor {
         this.isalarm = isalarm;
     }
 
-    @Basic
-    @Column(name = "isdeleted")
     public Boolean getIsdeleted() {
         return isdeleted;
     }
@@ -258,8 +208,6 @@ public class scc_Supervisor {
         this.isdeleted = isdeleted;
     }
 
-    @Basic
-    @Column(name = "lastalignmentdate")
     public Long getLastalignmentdate() {
         return lastalignmentdate;
     }
@@ -268,8 +216,6 @@ public class scc_Supervisor {
         this.lastalignmentdate = lastalignmentdate;
     }
 
-    @Basic
-    @Column(name = "lastmaintenancedate")
     public Long getLastmaintenancedate() {
         return lastmaintenancedate;
     }
@@ -278,8 +224,6 @@ public class scc_Supervisor {
         this.lastmaintenancedate = lastmaintenancedate;
     }
 
-    @Basic
-    @Column(name = "lastsynchronizationdate")
     public Long getLastsynchronizationdate() {
         return lastsynchronizationdate;
     }
@@ -288,8 +232,6 @@ public class scc_Supervisor {
         this.lastsynchronizationdate = lastsynchronizationdate;
     }
 
-    @Basic
-    @Column(name = "lifetest")
     public Boolean getLifetest() {
         return lifetest;
     }
@@ -298,8 +240,6 @@ public class scc_Supervisor {
         this.lifetest = lifetest;
     }
 
-    @Basic
-    @Column(name = "notes")
     public Boolean getNotes() {
         return notes;
     }
@@ -308,8 +248,6 @@ public class scc_Supervisor {
         this.notes = notes;
     }
 
-    @Basic
-    @Column(name = "proxyid")
     public String getProxyid() {
         return proxyid;
     }
@@ -318,8 +256,6 @@ public class scc_Supervisor {
         this.proxyid = proxyid;
     }
 
-    @Basic
-    @Column(name = "softwareversion")
     public String getSoftwareversion() {
         return softwareversion;
     }
@@ -328,8 +264,6 @@ public class scc_Supervisor {
         this.softwareversion = softwareversion;
     }
 
-    @Basic
-    @Column(name = "synchronization")
     public Boolean getSynchronization() {
         return synchronization;
     }
@@ -338,8 +272,6 @@ public class scc_Supervisor {
         this.synchronization = synchronization;
     }
 
-    @Basic
-    @Column(name = "type")
     public String getType() {
         return type;
     }
@@ -347,9 +279,6 @@ public class scc_Supervisor {
     public void setType(String type) {
         this.type = type;
     }
-
-
-    @Basic
 
     public Integer getMaintenanceareaId() {
         return maintenanceareaId;
@@ -359,8 +288,6 @@ public class scc_Supervisor {
         this.maintenanceareaId = maintenanceareaId;
     }
 
-    @Basic
-
     public Integer getSiteId() {
         return siteId;
     }
@@ -368,5 +295,4 @@ public class scc_Supervisor {
     public void setSiteId(Integer siteId) {
         this.siteId = siteId;
     }
-
 }

@@ -1,32 +1,18 @@
 package remoteentity;
 
-import javax.persistence.*;
 import java.sql.Timestamp;
 
-@Entity
-@Table(name = "company", catalog = "remote")
 public class scc_Company {
-    @Column(name = "type")
     private int type;
-    @Id
     private int id;
-    @Column(name = "address")
     private String address;
-    @Column(name = "city")
     private String city;
-    @Column(name = "country")
     private String country;
-    @Column(name = "email")
     private String email;
-    @Column(name = "fax")
     private String fax;
-    @Column(name = "phone")
     private String phone;
-    @Column(name = "name")
     private String name;
 
-
-    @Basic
 
     public int getType() {
         return type;
@@ -36,8 +22,6 @@ public class scc_Company {
         this.type = type;
     }
 
-
-    @Basic
     public int getId() {
         return id;
     }
@@ -45,8 +29,6 @@ public class scc_Company {
     public void setId(int id) {
         this.id = id;
     }
-
-    @Basic
 
     public String getAddress() {
         return address;
@@ -56,8 +38,6 @@ public class scc_Company {
         this.address = address;
     }
 
-    @Basic
-
     public String getCity() {
         return city;
     }
@@ -65,8 +45,6 @@ public class scc_Company {
     public void setCity(String city) {
         this.city = city;
     }
-
-    @Basic
 
     public String getCountry() {
         return country;
@@ -76,8 +54,6 @@ public class scc_Company {
         this.country = country;
     }
 
-    @Basic
-
     public String getEmail() {
         return email;
     }
@@ -85,8 +61,6 @@ public class scc_Company {
     public void setEmail(String email) {
         this.email = email;
     }
-
-    @Basic
 
     public String getFax() {
         return fax;
@@ -96,8 +70,6 @@ public class scc_Company {
         this.fax = fax;
     }
 
-    @Basic
-
     public String getPhone() {
         return phone;
     }
@@ -106,9 +78,6 @@ public class scc_Company {
         this.phone = phone;
     }
 
-
-    @Basic
-
     public String getName() {
         return name;
     }
@@ -116,7 +85,4 @@ public class scc_Company {
     public void setName(String name) {
         this.name = name;
     }
-
-
-
 }

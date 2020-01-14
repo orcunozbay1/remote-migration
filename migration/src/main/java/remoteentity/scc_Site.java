@@ -1,54 +1,44 @@
 package remoteentity;
 
-import javax.persistence.*;
 import java.sql.Timestamp;
 
-@Entity
-@Table(name = "site", schema = "scc", catalog = "remote")
 public class scc_Site {
-    @Id
     private int id;
-    @Column(name = "address")
     private String address;
-    @Column
+    
     private String city;
-    @Column
+    
     private String country;
-    @Column
+    
     private String email;
-    @Column
+    
     private String fax;
-    @Column
+    
     private String phone;
-    @Column
+    
     private String description;
-    @Column
+    
     private Double latitude;
-    @Column
+    
     private String localtimezone;
-    @Column
+    
     private Double longitude;
-    @Column
+    
     private String name;
-    @Column
+    
     private String endtime;
-    @Column
+    
     private Boolean fullday;
-    @Column
+    
     private String starttime;
-    @Column
+    
     private String timezone;
-    @Column
+    
     private Double zoom;
-    @Column(name = "maintenancearea_id")
     private Integer maintenanceareaId;
-    @Column(name = "platformcustomer_id")
     private Integer platformcustomerId;
-    @Column(name = "type_id")
     private Integer typeId;
 
-    @Basic
-    @Column(name = "id")
     public int getId() {
         return id;
     }
@@ -56,8 +46,6 @@ public class scc_Site {
     public void setId(int id) {
         this.id = id;
     }
-
-    @Basic
 
     public String getAddress() {
         return address;
@@ -67,8 +55,6 @@ public class scc_Site {
         this.address = address;
     }
 
-    @Basic
-    @Column(name = "city")
     public String getCity() {
         return city;
     }
@@ -77,8 +63,6 @@ public class scc_Site {
         this.city = city;
     }
 
-    @Basic
-    @Column(name = "country")
     public String getCountry() {
         return country;
     }
@@ -87,8 +71,6 @@ public class scc_Site {
         this.country = country;
     }
 
-    @Basic
-    @Column(name = "email")
     public String getEmail() {
         return email;
     }
@@ -97,8 +79,6 @@ public class scc_Site {
         this.email = email;
     }
 
-    @Basic
-    @Column(name = "fax")
     public String getFax() {
         return fax;
     }
@@ -107,8 +87,6 @@ public class scc_Site {
         this.fax = fax;
     }
 
-    @Basic
-    @Column(name = "phone")
     public String getPhone() {
         return phone;
     }
@@ -117,8 +95,6 @@ public class scc_Site {
         this.phone = phone;
     }
 
-    @Basic
-    @Column(name = "description")
     public String getDescription() {
         return description;
     }
@@ -127,8 +103,6 @@ public class scc_Site {
         this.description = description;
     }
 
-    @Basic
-    @Column(name = "latitude")
     public Double getLatitude() {
         return latitude;
     }
@@ -137,8 +111,6 @@ public class scc_Site {
         this.latitude = latitude;
     }
 
-    @Basic
-    @Column(name = "localtimezone")
     public String getLocaltimezone() {
         return localtimezone;
     }
@@ -147,8 +119,6 @@ public class scc_Site {
         this.localtimezone = localtimezone;
     }
 
-    @Basic
-    @Column(name = "longitude")
     public Double getLongitude() {
         return longitude;
     }
@@ -157,8 +127,6 @@ public class scc_Site {
         this.longitude = longitude;
     }
 
-    @Basic
-    @Column(name = "name")
     public String getName() {
         return name;
     }
@@ -167,8 +135,6 @@ public class scc_Site {
         this.name = name;
     }
 
-    @Basic
-    @Column(name = "endtime")
     public String getEndtime() {
         return endtime;
     }
@@ -177,8 +143,6 @@ public class scc_Site {
         this.endtime = endtime;
     }
 
-    @Basic
-    @Column(name = "fullday")
     public Boolean getFullday() {
         return fullday;
     }
@@ -187,8 +151,6 @@ public class scc_Site {
         this.fullday = fullday;
     }
 
-    @Basic
-    @Column(name = "starttime")
     public String getStarttime() {
         return starttime;
     }
@@ -197,8 +159,6 @@ public class scc_Site {
         this.starttime = starttime;
     }
 
-    @Basic
-    @Column(name = "timezone")
     public String getTimezone() {
         return timezone;
     }
@@ -207,8 +167,6 @@ public class scc_Site {
         this.timezone = timezone;
     }
 
-    @Basic
-    @Column(name = "zoom")
     public Double getZoom() {
         return zoom;
     }
@@ -216,8 +174,6 @@ public class scc_Site {
     public void setZoom(Double zoom) {
         this.zoom = zoom;
     }
-
-    @Basic
 
     public Integer getMaintenanceareaId() {
         return maintenanceareaId;
@@ -227,8 +183,6 @@ public class scc_Site {
         this.maintenanceareaId = maintenanceareaId;
     }
 
-    @Basic
-
     public Integer getPlatformcustomerId() {
         return platformcustomerId;
     }
@@ -237,8 +191,6 @@ public class scc_Site {
         this.platformcustomerId = platformcustomerId;
     }
 
-    @Basic
-
     public Integer getTypeId() {
         return typeId;
     }
@@ -246,5 +198,4 @@ public class scc_Site {
     public void setTypeId(Integer typeId) {
         this.typeId = typeId;
     }
-
 }

@@ -1,8 +1,7 @@
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import remoteentity.rm_Cfarea;
 import remoteentity.*;
 
+import java.sql.*;
 import java.util.List;
 
 public class Starter {
@@ -19,16 +18,36 @@ public class Starter {
 
         //supervisor id si ile başlıyoruz
         //id : 4443
-        Session session = HibernateConfig.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        try{
-            saveSupervisor(session,4443);
 
+
+        String userName = "postgres";
+        String password = "gala123456";
+        String url = "jdbc:postgresql://178.242.49.250:15432/remote";
+
+        Connection connection = null;
+        try {
+            connection = DriverManager.getConnection(url, userName, password);
+
+          saveSupervisor(connection,4443);
+
+            //saveSupervisor(connection,4443);
+
+            System.out.println("Connected to database");
         }
-        catch (Exception ex)
-        {
-            transaction.rollback();
-            ex.printStackTrace();
+        catch (SQLException e) {
+            System.err.println("SQLState: " + e.getSQLState());
+            System.err.println("Error Code: " + e.getErrorCode());
+            System.err.println("Message: " + e.getMessage());
+            e.printStackTrace(System.err);
+        }
+        finally {
+            try {
+                connection.close();
+
+            }
+            catch (SQLException e) {
+                System.err.println("The connections can not be closed.");
+            }
         }
 
         //saveController();
@@ -37,10 +56,22 @@ public class Starter {
     } //fstaf msfvw
 
 
-    private static void saveSupervisor(Session session,Integer supId)
-    {
-        rm_Cfsupervisors supervisor= (rm_Cfsupervisors) session.createQuery("from rm_Cfsupervisors where id=:id").setParameter("id",supId).getSingleResult();
+    private static void saveSupervisor(Connection connection,Integer supId) throws SQLException {
+        PreparedStatement statement=connection.prepareStatement("select * from public.cfsupervisors where id=?");
+        statement.setInt(1,supId);
+        ResultSet supervisorResult=statement.executeQuery();
         scc_Supervisor newSupervisor=new scc_Supervisor();
+
+        while (supervisorResult.next())
+        {
+            newSupervisor.setId(supervisorResult.getInt("id"));
+            newSupervisor.setDescription(supervisorResult.getString("description"));
+        }
+
+        System.out.println(newSupervisor);
+
+
+        /*rm_Cfsupervisors supervisor= (rm_Cfsupervisors) session.createQuery("from rm_Cfsupervisors where id=:id").setParameter("id",supId).getSingleResult();
         newSupervisor.setDescription(supervisor.getDescription());
         newSupervisor.setFtpUsername(supervisor.getCuser());
         newSupervisor.setFtpPassword(supervisor.getPassword());
@@ -50,13 +81,13 @@ public class Starter {
         //newSupervisor.setSiteId(supervisor.getKsite());
         session.save(newSupervisor);
         System.out.println(newSupervisor.getId());
-        List<rm_Lgdevice> controllers=session.createQuery("from rm_Lgdevice where isenabled='TRUE' and iddevmdl>0 and iscancelled='FALSE' and lastupdate is not null and kidsupervisor=:supervisor").getResultList();
+        List<rm_Lgdevice> controllers=session.createQuery("from rm_Lgdevice where isenabled='TRUE' and iddevmdl>0 and iscancelled='FALSE' and lastupdate is not null and kidsupervisor=:supervisor")
+                .setParameter("supervisor",supId).getResultList();
         for (rm_Lgdevice controller:controllers)
         {
             saveController(session,controller);
 
-        }
-
+        }*/
     }
 
 
@@ -147,7 +178,7 @@ public class Starter {
                 sccVariable.setBitposition(rmVariable.getBitposition());
                 //sccVariable.setVariableKey(rmVariable);
                 //                    sccVariable.setColor(rmVariable.get);
-                sccVariable.setHaccp(rmVariable.getIshaccp().trim().equals("TRUE"));
+                sccVariable.setHaccp(String.valueOf(rmVariable.getIshaccp()).equals("1"));
                 sccVariable.setDeviceModelId(rmVariable.getIddevice());
                 sccVariable.setType(rmVariable.getType());
                 sccVariable.setInaddress(rmVariable.getAddressin());
@@ -155,7 +186,7 @@ public class Starter {
                 sccVariable.setDimension(rmVariable.getVardimension());
                 sccVariable.setLength(rmVariable.getVarlength());
                 sccVariable.setBitposition(rmVariable.getBitposition());
-                sccVariable.setSigned(rmVariable.getSigned().trim().equals("TRUE"));
+                sccVariable.setSigned(String.valueOf(rmVariable.getSigned()).equals("TRUE"));
                 sccVariable.setDecimal(rmVariable.getDecimal().equals(1));
                 sccVariable.setTodisplay(rmVariable.getTodisplay());
                 sccVariable.setPriority(rmVariable.getPriority());
