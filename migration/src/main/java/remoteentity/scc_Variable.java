@@ -1,5 +1,8 @@
 package remoteentity;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 
 public class scc_Variable {
@@ -68,6 +71,80 @@ public class scc_Variable {
    
     private Integer type;
     private Integer deviceModelId;
+
+    private Integer createdById;
+
+    private scc_Description description;
+
+
+    public void insert(Connection sccConnection) throws SQLException {
+        String sqlInsertQuery="insert into smartcooling_db.public.variable" +
+                "(id, variable_key, color, creationtimestamp, haccp, category, combo, enumvalue, imageoff, imageon, iscommand, hsdelta, hsfrequency, hstime, priority, relay, todisplay, avalue, bvalue, bitposition, dimension, length, varencoding, inaddress, inaddress_functiontype, inaddress_index, outaddress, outaddress_functiontype, outaddress_index,  \"decimal\", defaultvalue, maximum, measureunit, minimum, signed, \"type\", created_by_id, device_model_id) " +
+                "values (?, ?, ?, CURRENT_TIMESTAMP , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        PreparedStatement insertPrepared=sccConnection.prepareStatement(sqlInsertQuery);
+
+        insertPrepared.setInt(1,this.id);
+        insertPrepared.setString(2,variableKey);
+        insertPrepared.setString(3,color);
+        //insertPrepared.setTimestamp(1,);
+        insertPrepared.setBoolean(4,haccp);
+        insertPrepared.setInt(5,category);
+        insertPrepared.setString(6,combo);
+        insertPrepared.setString(7,enumvalue);
+        insertPrepared.setString(8,imageoff);
+        insertPrepared.setString(9,imageon);
+        insertPrepared.setBoolean(10,iscommand);
+        insertPrepared.setInt(11,hsdelta);
+        insertPrepared.setInt(12,hsfrequency);
+        insertPrepared.setInt(13,hstime);
+        insertPrepared.setInt(14,priority);
+        insertPrepared.setBoolean(15,relay);
+        insertPrepared.setString(16,todisplay);
+        insertPrepared.setDouble(17,avalue);
+        insertPrepared.setDouble(18,bvalue);
+        insertPrepared.setInt(19,bitposition);
+        insertPrepared.setInt(20,dimension);
+        insertPrepared.setInt(21,length);
+        insertPrepared.setInt(22,varencoding);
+        insertPrepared.setInt(23,inaddress);
+        insertPrepared.setInt(24,inaddressFunctiontype);
+        insertPrepared.setInt(25,inaddressIndex);
+        insertPrepared.setInt(26,outaddress);
+        insertPrepared.setInt(27,outaddressFunctiontype);
+        insertPrepared.setInt(28,outaddressIndex);
+        //insertPrepared.setTimestamp(1,);
+        insertPrepared.setBoolean(29,decimal);
+        insertPrepared.setDouble(30,defaultvalue);
+        insertPrepared.setString(31,maximum);
+        insertPrepared.setString(32,measureunit);
+        insertPrepared.setString(33,minimum);
+        insertPrepared.setBoolean(34,signed);
+        insertPrepared.setInt(35,type);
+        insertPrepared.setInt(36,createdById);
+        insertPrepared.setInt(37,deviceModelId);
+
+        insertPrepared.executeUpdate();
+
+
+     String descriptionSQL="INSERT INTO public.description " +
+             "(variable_id, defaultdesc, longdesc, shortdesc, \"language\") " +
+             "VALUES(?, ?, ?, ?, ?);";
+
+        PreparedStatement descriptionPrepared=sccConnection.prepareStatement(descriptionSQL);
+        descriptionPrepared.setInt(1,this.id);
+        descriptionPrepared.setString(2,description.getDefaultdesc());
+        descriptionPrepared.setString(3,description.getLongdesc());
+        descriptionPrepared.setString(4,description.getShortdesc());
+        descriptionPrepared.setString(5,description.getLanguage());
+
+        descriptionPrepared.executeUpdate();
+
+
+
+
+    }
+
+
 
     public int getId() {
         return id;
@@ -355,5 +432,21 @@ public class scc_Variable {
 
     public void setDeviceModelId(Integer deviceModelId) {
         this.deviceModelId = deviceModelId;
+    }
+
+    public scc_Description getDescription() {
+        return description;
+    }
+
+    public void setDescription(scc_Description description) {
+        this.description = description;
+    }
+
+    public Integer getCreatedById() {
+        return createdById;
+    }
+
+    public void setCreatedById(Integer createdById) {
+        this.createdById = createdById;
     }
 }

@@ -1,12 +1,23 @@
 package remoteentity;
 
 
+import java.sql.Connection;
+
 public class scc_Description {
     private int variableId;
     private String defaultdesc;
     private String longdesc;
     private String shortdesc;
     private String language;
+
+
+
+    public void insert(Connection connection)
+    {
+
+    }
+
+
 
     public int getVariableId() {
         return variableId;

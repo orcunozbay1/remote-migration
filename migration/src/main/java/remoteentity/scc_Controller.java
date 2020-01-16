@@ -93,4 +93,21 @@ public class scc_Controller {
     public void setSupervisorId(Integer supervisorId) {
         this.supervisorId = supervisorId;
     }
+
+
+    @Override
+    public String toString() {
+        return "scc_Controller{" +
+                "id=" + id +
+                ", creationtimestamp=" + creationtimestamp +
+                ", description='" + description + '\'' +
+                ", isactive=" + isactive +
+                ", iscanceled=" + iscanceled +
+                ", iskpienabled=" + iskpienabled +
+                ", islogical=" + islogical +
+                ", name='" + name + '\'' +
+                ", devicemodelId=" + devicemodelId +
+                ", supervisorId=" + supervisorId +
+                '}';
+    }
 }

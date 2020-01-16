@@ -295,4 +295,40 @@ public class scc_Supervisor {
     public void setSiteId(Integer siteId) {
         this.siteId = siteId;
     }
+
+    @Override
+    public String toString() {
+        return "scc_Supervisor{" +
+                "id=" + id +
+                ", connection=" + connection +
+                ", connectiontype='" + connectiontype + '\'' +
+                ", identifier='" + identifier + '\'' +
+                ", ipAdress='" + ipAdress + '\'' +
+                ", language='" + language + '\'' +
+                ", macaddress='" + macaddress + '\'' +
+                ", password='" + password + '\'' +
+                ", dataalignment=" + dataalignment +
+                ", description='" + description + '\'' +
+                ", events=" + events +
+                ", firstsynchronizationdate=" + firstsynchronizationdate +
+                ", ftpPassword='" + ftpPassword + '\'' +
+                ", ftpUsername='" + ftpUsername + '\'' +
+                ", healthchecking=" + healthchecking +
+                ", httpPassword='" + httpPassword + '\'' +
+                ", httpUsername='" + httpUsername + '\'' +
+                ", isalarm=" + isalarm +
+                ", isdeleted=" + isdeleted +
+                ", lastalignmentdate=" + lastalignmentdate +
+                ", lastmaintenancedate=" + lastmaintenancedate +
+                ", lastsynchronizationdate=" + lastsynchronizationdate +
+                ", lifetest=" + lifetest +
+                ", notes=" + notes +
+                ", proxyid='" + proxyid + '\'' +
+                ", softwareversion='" + softwareversion + '\'' +
+                ", synchronization=" + synchronization +
+                ", type='" + type + '\'' +
+                ", maintenanceareaId=" + maintenanceareaId +
+                ", siteId=" + siteId +
+                '}';
+    }
 }
