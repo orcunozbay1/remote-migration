@@ -1,5 +1,8 @@
 package remoteentity;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 
 public class scc_Site {
@@ -38,6 +41,7 @@ public class scc_Site {
     private Integer maintenanceareaId;
     private Integer platformcustomerId;
     private Integer typeId;
+    private Integer createdById;
 
     public int getId() {
         return id;
@@ -198,4 +202,39 @@ public class scc_Site {
     public void setTypeId(Integer typeId) {
         this.typeId = typeId;
     }
+
+    public Integer getCreatedById() {
+        return createdById;
+    }
+
+    public void setCreatedById(Integer createdById) {
+        this.createdById = createdById;
+    }
+
+    public void insert(Connection sccConnection) throws SQLException {
+        String query="INSERT INTO public.site " +
+                "(id, address, city, country, email, fax, phone, description,  latitude,  longitude, \"name\", created_by_id, maintenancearea_id, platformcustomer_id, isdeleted,creationtimestamp) " +
+                "VALUES(?, ?,?,?,?,?,?,?,?,?,?,?,?,?,false, CURRENT_TIMESTAMP);";
+        PreparedStatement insertPrepared=sccConnection.prepareStatement(query);
+        insertPrepared.setInt(1,this.id);
+        insertPrepared.setString(2,this.address);
+        insertPrepared.setString(3,this.city);
+        insertPrepared.setString(4,this.country);
+        insertPrepared.setString(5,this.email);
+        insertPrepared.setString(6,this.fax);
+        insertPrepared.setString(7,this.phone);
+        insertPrepared.setString(8,this.description);
+        insertPrepared.setObject(9,this.latitude);
+        insertPrepared.setObject(10,this.longitude);
+        insertPrepared.setString(11,this.name);
+        insertPrepared.setInt(12,this.createdById);
+        insertPrepared.setObject(13,this.maintenanceareaId);
+        insertPrepared.setInt(14,this.platformcustomerId);
+
+        insertPrepared.executeUpdate();
+
+
+    }
+
+
 }

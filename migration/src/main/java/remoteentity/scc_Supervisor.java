@@ -1,5 +1,8 @@
 package remoteentity;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 
 public class scc_Supervisor {
@@ -55,6 +58,7 @@ public class scc_Supervisor {
     private String type;
     private Integer maintenanceareaId;
     private Integer siteId;
+    private Integer createdById;
 
     public int getId() {
         return id;
@@ -296,39 +300,38 @@ public class scc_Supervisor {
         this.siteId = siteId;
     }
 
-    @Override
-    public String toString() {
-        return "scc_Supervisor{" +
-                "id=" + id +
-                ", connection=" + connection +
-                ", connectiontype='" + connectiontype + '\'' +
-                ", identifier='" + identifier + '\'' +
-                ", ipAdress='" + ipAdress + '\'' +
-                ", language='" + language + '\'' +
-                ", macaddress='" + macaddress + '\'' +
-                ", password='" + password + '\'' +
-                ", dataalignment=" + dataalignment +
-                ", description='" + description + '\'' +
-                ", events=" + events +
-                ", firstsynchronizationdate=" + firstsynchronizationdate +
-                ", ftpPassword='" + ftpPassword + '\'' +
-                ", ftpUsername='" + ftpUsername + '\'' +
-                ", healthchecking=" + healthchecking +
-                ", httpPassword='" + httpPassword + '\'' +
-                ", httpUsername='" + httpUsername + '\'' +
-                ", isalarm=" + isalarm +
-                ", isdeleted=" + isdeleted +
-                ", lastalignmentdate=" + lastalignmentdate +
-                ", lastmaintenancedate=" + lastmaintenancedate +
-                ", lastsynchronizationdate=" + lastsynchronizationdate +
-                ", lifetest=" + lifetest +
-                ", notes=" + notes +
-                ", proxyid='" + proxyid + '\'' +
-                ", softwareversion='" + softwareversion + '\'' +
-                ", synchronization=" + synchronization +
-                ", type='" + type + '\'' +
-                ", maintenanceareaId=" + maintenanceareaId +
-                ", siteId=" + siteId +
-                '}';
+    public Integer getCreatedById() {
+        return createdById;
     }
+
+    public void setCreatedById(Integer createdById) {
+        this.createdById = createdById;
+    }
+
+    public void insert(Connection sccConnection) throws SQLException {
+        String query="INSERT INTO public.supervisor(id, connectiontype, identifier, ip_adress, \"language\", macaddress, \"password\", creationtimestamp, description, " +
+                "ftp_password, ftp_username,  http_password, http_username,  isdeleted, \"type\", created_by_id,  site_id)" +
+                "VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP ,?,?,?,?,?,false,?,?,?);";
+        PreparedStatement insertPrepared=sccConnection.prepareStatement(query);
+        insertPrepared.setInt(1,this.id);
+        insertPrepared.setString(2,this.connectiontype);
+        insertPrepared.setString(3,this.identifier);
+        insertPrepared.setString(4,this.ipAdress);
+        insertPrepared.setString(5,this.language);
+        insertPrepared.setString(6,this.macaddress);
+        insertPrepared.setString(7,this.password);
+        insertPrepared.setObject(8,this.description);
+        insertPrepared.setObject(9,this.ftpPassword);
+        insertPrepared.setString(10,this.ftpUsername);
+        insertPrepared.setString(11,this.httpPassword);
+        insertPrepared.setObject(12,this.httpUsername);
+        insertPrepared.setString(13,this.type);
+        insertPrepared.setInt(14,this.createdById);
+        insertPrepared.setInt(15,this.siteId);
+
+        insertPrepared.executeUpdate();
+
+
+    }
+
 }

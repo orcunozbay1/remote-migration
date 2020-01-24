@@ -1,5 +1,8 @@
 package remoteentity;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 
 public class scc_Controller {
@@ -13,6 +16,7 @@ public class scc_Controller {
     private String name;
     private Integer devicemodelId;
     private Integer supervisorId;
+    private Integer createdById;
 
     public int getId() {
         return id;
@@ -94,20 +98,34 @@ public class scc_Controller {
         this.supervisorId = supervisorId;
     }
 
-
-    @Override
-    public String toString() {
-        return "scc_Controller{" +
-                "id=" + id +
-                ", creationtimestamp=" + creationtimestamp +
-                ", description='" + description + '\'' +
-                ", isactive=" + isactive +
-                ", iscanceled=" + iscanceled +
-                ", iskpienabled=" + iskpienabled +
-                ", islogical=" + islogical +
-                ", name='" + name + '\'' +
-                ", devicemodelId=" + devicemodelId +
-                ", supervisorId=" + supervisorId +
-                '}';
+    public Integer getCreatedById() {
+        return createdById;
     }
+
+    public void setCreatedById(Integer createdById) {
+        this.createdById = createdById;
+    }
+
+
+
+    public void insert(Connection sccConnection) throws SQLException {
+        String query="INSERT INTO public.controller\n" +
+                "(id, creationtimestamp, description, isactive,  \"name\",  created_by_id,  devicemodel_id, supervisor_id)" +
+                "VALUES(?,CURRENT_TIMESTAMP ,?,TRUE ,?,?,?,?);";
+        PreparedStatement insertPrepared=sccConnection.prepareStatement(query);
+        insertPrepared.setInt(1,this.id);
+        insertPrepared.setString(2,this.description);
+        insertPrepared.setString(3,this.name);
+        insertPrepared.setInt(4,this.createdById);
+        insertPrepared.setInt(5,this.devicemodelId);
+        insertPrepared.setInt(6,this.supervisorId);
+
+
+        insertPrepared.executeUpdate();
+
+
+    }
+
+
+
 }
