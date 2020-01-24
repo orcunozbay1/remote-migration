@@ -9,6 +9,8 @@ public class Utility {
     public static final Integer ES_PORT = 19200;
     public static final String ES_PROTOCOL = "http";
 
+    public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+
     private static RestHighLevelClient esClient=null;
 
     public static RestHighLevelClient getElasticSearchClient() {

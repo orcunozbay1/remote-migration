@@ -1,8 +1,9 @@
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.elasticsearch.action.bulk.BulkItemResponse;
+import entity.AlarmChild;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -12,11 +13,17 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import remoteentity.*;
 
 import java.io.IOException;
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Starter {
     static String userName = "postgres";
@@ -47,19 +54,19 @@ public class Starter {
             rmConnection = DriverManager.getConnection(rmUrl, userName, password);
             sccConnection = DriverManager.getConnection(sccUrl, userName, password);
 
-            createSystemUser();
+           // createSystemUser();
 
-            saveMasterDeviceModels();
-            saveAreas();
-
-            saveCompanies();
-
-            saveSites();
+            //saveMasterDeviceModels();
+            //saveCompanies();
+            //saveAreas();
 
 
+            //saveSites();
 
 
-            System.out.println("Finished successfully");
+            saveAlarmsFromControllers(null,null,null);
+
+            System.out.println("success");
         }
         catch (SQLException e) {
             System.err.println("SQLState: " + e.getSQLState());
@@ -67,6 +74,8 @@ public class Starter {
             System.err.println("Message: " + e.getMessage());
             e.printStackTrace(System.err);
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
             e.printStackTrace();
         } finally {
             try {
@@ -174,7 +183,7 @@ public class Starter {
 
     }
 
-    private static void saveSites() throws SQLException, IOException {
+    private static void saveSites() throws SQLException, IOException, ParseException {
         //Company tarafından başlık bilgisini alıp supervisorden site bilgisini birleştirip site olarak atacağız.
         PreparedStatement statement=rmConnection.prepareStatement("select * from public.cfcompany where pcomptype='PNT' and karea <>'CFM'");
         ResultSet companySiteResult=statement.executeQuery();
@@ -266,7 +275,7 @@ public class Starter {
     }
 
 
-    private static void saveSupervisor(String rmSite,Integer sccSite) throws SQLException, IOException {
+    private static void saveSupervisor(String rmSite,Integer sccSite) throws SQLException, IOException, ParseException {
         PreparedStatement statement=rmConnection.prepareStatement("select * from public.cfsupervisors where ksite=?");
         statement.setString(1,rmSite);
         ResultSet supervisorResult=statement.executeQuery();
@@ -283,8 +292,8 @@ public class Starter {
             newSupervisor.setMacaddress(supervisorResult.getString("macaddress"));
             newSupervisor.setSiteId(sccSite);
             newSupervisor.setCreatedById(systemUserId);
-            newSupervisor.insert(sccConnection);
             newSupervisor.setMaintenanceareaId(defaultMaintenanceArea);
+            newSupervisor.insert(sccConnection);
             saveController(supervisorResult.getInt("id"), newSupervisor.getId());
         }
 
@@ -298,7 +307,7 @@ public class Starter {
      * Anlık id oluşturuluyor
  *      lgdevice
      */
-     private static void saveController(Integer rmSupervisorId,Integer sccSupervisorId) throws SQLException, NullPointerException, IOException {
+     private static void saveController(Integer rmSupervisorId,Integer sccSupervisorId) throws SQLException, NullPointerException, IOException, ParseException {
          PreparedStatement controllerStatement = rmConnection.prepareStatement("select * from public.lgdevice where isenabled='TRUE' and iddevmdl>0 and iscancelled='FALSE' and lastupdate is not null and iddevice>0 and kidsupervisor=?");
          controllerStatement.setInt(1,rmSupervisorId);
          ResultSet controllers=controllerStatement.executeQuery();
@@ -333,7 +342,7 @@ public class Starter {
              //controller.setSupervisorId(controllers.getInt(controllers.getInt("iddevmdl")));
              controller.insert(sccConnection);
 
-             saveAlarmsFromControllers(controller);
+             saveAlarmsFromControllers(rmSupervisorId,controllers.getInt("iddevice"),controller.getId());
              newControllers.add(controller);
          }
 
@@ -503,11 +512,12 @@ public class Starter {
     // recall= 10,010,057
     // reset = 19,694
     // Alarm ilk oluştuğunda active'e geliyor. arrive a kopyalanıyor.
-    private static void saveAlarmsFromControllers(scc_Controller controller) throws SQLException, IOException {
+    private static void saveAlarmsFromControllers(Integer rmSuperVisorId,Integer rmControllerId,Integer sccControllerId) throws SQLException, IOException, ParseException {
 
         String viewCode = "select \n" +
                 "v.id as variableId,\n" +
-                "v.inaddress_index as variableIndex,\n" +
+                "v.inaddress_index as variableIndex," +
+                "v.priority as priority, \n" +
                 "d.longdesc as longdesc,\n" +
                 "c.id as controllerid,\n" +
                 "c.description as controllerdescription,\n" +
@@ -518,31 +528,35 @@ public class Starter {
                 "customer.id as PlatformCustomerCompanyId,\n" +
                 "customer.name as PlatformCustomerCompanyName,\n" +
                 "maintenance.id as maintenanceCompanyId,\n" +
-                "maintenance.name as maintenanceCompanyName\n" +
-                "\n" +
+                "maintenance.name as maintenanceCompanyName,\n" +
+                "dm.id as deviceModelId," +
+                "main_area.description as areadescription \n" +
                 "\n" +
                 "from variable v\n" +
                 "inner join description d on d.variable_id =v.id and d.\"language\"='TR'\n" +
                 "inner join device_model dm on v.device_model_id =dm.id \n" +
                 "inner join controller c on c.devicemodel_id =dm.id \n" +
-                "inner join supervisor sup on sup.id=c.supervisor_id and sup.id < 10 \n" +
+                "inner join supervisor sup on sup.id=c.supervisor_id \n" +
                 "inner join site s on s.id=sup.site_id \n" +
                 "inner join company customer on customer.id=s.platformcustomer_id \n" +
                 "inner join maintenance_area main_area on main_area.id =sup.maintenancearea_id \n" +
-                "inner join company maintenance on maintenance.id=main_area.maintenance_operator_id ";
+                "inner join company maintenance on maintenance.id=main_area.maintenance_operator_id " +
+                "where v.type=4 ";
 
         PreparedStatement parentStatement = sccConnection.prepareStatement(viewCode);
         ResultSet parentResult = parentStatement.executeQuery();
         while (parentResult.next())//Her bir parent için
         {
 
-            SearchHits hits = getExistParent(parentResult.getInt("controllerid"),parentResult.getInt("variableid"));
+            String parentDocId =  parentResult.getInt("PlatformCustomerCompanyId") + "_"
+                    + parentResult.getInt("siteid") + "_" + parentResult.getInt("supervisorid") + "_"
+                    + parentResult.getInt("controllerid") + "_" + parentResult.getInt("deviceModelId") + "_" + parentResult.getInt("variableId");
 
 
-            if(hits.getTotalHits().value <= 0 ) // hiç kaydedilmemiş ise
+            if(!existParent(parentDocId) ) // hiç kaydedilmemiş ise
             {
                 BulkRequest alarmBulkRequest = new BulkRequest("alarm-parent-index");
-                String parentDocId = "";
+
 
                 JsonObject parentAlarmObject = new JsonObject(); // TODO: Şimdilik manuel oluşturduğumuz parent json'u daha
 
@@ -599,48 +613,101 @@ public class Starter {
                 alarmBulkRequest.add(parentReturnRequest);
 
 
-                List<BulkItemResponse> responseList = new ArrayList<>();
                 BulkResponse bulkResponse = Utility.getElasticSearchClient().bulk(alarmBulkRequest, RequestOptions.DEFAULT);
             }
 
-            System.out.println(hits);
+            //Alarm child ayarları
+            saveAlarmChild(parentDocId,parentResult);
+
+
+
+
 
         }
 
     }
 
-        private static SearchHits getExistParent(Integer controllerId, Integer variableId) throws IOException {
+        private static Boolean existParent(String parentId) throws IOException {
 
-            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
             // Sorgulama kısmı
-            BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
-            boolQuery.must(QueryBuilders.matchQuery("alarm-parent.variableId",controllerId));
-            boolQuery.must(QueryBuilders.matchQuery("alarm-parent.controllerId",variableId));
-
-          /*  BoolQueryBuilder totalBoolQuery = QueryBuilders.boolQuery();
-            HasParentQueryBuilder parentQueryBuilder = new HasParentQueryBuilder("alarm-parent",
-                    boolQuery, false);
-            InnerHitBuilder innerHitBuilder = new InnerHitBuilder();
-
-            String[] includesFields = new String[] {
-                    "alarm-parent.controllerDescription", "alarm-parent.supervisorDescription",
-                    "alarm-parent.PlatformCustomerCompanyName", "alarm-parent.areaDescription",
-                    "alarm-parent.siteDescription",
-                    "alarm-parent.supervisorId", "alarm-parent.controllerId",
-                    "alarm-parent.variableIndex" };
-            parentQueryBuilder
-                    .innerHit(innerHitBuilder.setFetchSourceContext(new FetchSourceContext(true, includesFields, null)));
-            totalBoolQuery.must(parentQueryBuilder);
-
-            searchSourceBuilder.query(totalBoolQuery);*/
-          searchSourceBuilder.query(boolQuery);
+            GetRequest getRequest = new GetRequest("alarm-parent-index", parentId);
+            getRequest.fetchSourceContext(new FetchSourceContext(false));
+            getRequest.storedFields("_none_");
+            Boolean exists = Utility.getElasticSearchClient().exists(getRequest, RequestOptions.DEFAULT);
+            return exists;
+/*
+            searchSourceBuilder.query(boolQuery);
             SearchRequest searchRequest = new SearchRequest("alarm-parent-index");
             searchRequest.source(searchSourceBuilder);
 
             SearchResponse searchResponse = Utility.getElasticSearchClient().search(searchRequest,RequestOptions.DEFAULT);
 
-            return searchResponse.getHits();
+            return searchResponse.getHits();*/
 
+
+
+        }
+
+
+        private static void saveAlarmChild(String parentDocId,ResultSet parentResult) throws ParseException, SQLException {
+
+                // Her bir alarm için oluşturulacak rastgele değerler
+            Date dateNow = new Date();
+            DateFormat format = new SimpleDateFormat(Utility.DATE_FORMAT);
+            Date dateFirstDay = format.parse("2019-06-01T00:00:00+0000");
+            Date randomStartDate = new Date(
+                    ThreadLocalRandom.current().nextLong(dateFirstDay.getTime(), dateNow.getTime()));
+            Date randomEndDate = new Date(
+                    ThreadLocalRandom.current().nextLong(randomStartDate.getTime(), dateNow.getTime()));
+            AlarmChild alarmObject = new AlarmChild();
+            alarmObject.setVariableIndex(parentResult.getInt("variableId"));
+            alarmObject.setControllerId(parentResult.getInt("controllerId"));
+
+            alarmObject.setAlarmType("reset");
+
+            alarmObject.setArrivalTime("2019-06-01T00:00:00+0000"); // her zaman şuanın zamanı kullanılsın
+            alarmObject.setPriority(parentResult.getString("priority")); // variable'ın değeri
+            // ne ise odur.
+            Boolean hasResolutionThisAlarm = new Random().nextBoolean(); // rastgele resolution verelim mi
+
+            alarmObject.setResolution(true);
+            alarmObject.setResolutionMethod("Local Maintenance");
+            alarmObject.setResolutionTime("2019-06-01T00:00:00+0000");
+            alarmObject.setResolvedBy(systemUserId.toString());
+
+            alarmObject.setAcknowledge(true);
+
+            alarmObject.setAcknowledgeTime("2019-06-01T00:00:00+0000");
+            alarmObject.setInhibit(true);
+            alarmObject.setInhibitTime("2019-06-01T00:00:00+0000");
+
+            alarmObject.setWorkingHourStatus("workingHours");
+
+            JsonObject alarmContent=new JsonObject();
+            alarmContent.addProperty("alarmType","");
+            alarmContent.addProperty("startTime","");
+            alarmContent.addProperty("arrivalTime","");
+            alarmContent.addProperty("priority","");
+            alarmContent.addProperty("parentId","");
+            alarmContent.addProperty("workingHourStatus","");
+            alarmContent.addProperty("acknowledge","");
+            alarmContent.addProperty("inhibit","");
+            alarmContent.addProperty("resolution","");
+            alarmContent.addProperty("endTime","");
+            alarmContent.addProperty("resolvedBy","");
+            alarmContent.addProperty("resolutionTime","");
+            alarmContent.addProperty("resolutionMethod","");
+            alarmContent.addProperty("acknowledgeTime","");
+            alarmContent.addProperty("endTime","");
+
+            JsonObject alarmrow = new JsonObject();
+            alarmrow.add("alarm-child", alarmContent); // group adı child-alarm olanları json'a çevirelim.
+            JsonObject joinFieldJson = new JsonObject();
+            joinFieldJson.addProperty("name", "alarm-child");
+            joinFieldJson.addProperty("parent", parentDocId);
+            alarmrow.add("join_field", joinFieldJson);
+            IndexRequest returnRequest = new IndexRequest("alarm-parent-index").routing(parentDocId).source(alarmrow.toString(),
+                    XContentType.JSON);
 
 
         }

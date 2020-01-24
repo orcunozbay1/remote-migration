@@ -117,7 +117,7 @@ public class scc_Controller {
         insertPrepared.setString(2,this.description);
         insertPrepared.setString(3,this.name);
         insertPrepared.setInt(4,this.createdById);
-        insertPrepared.setInt(5,this.devicemodelId);
+        insertPrepared.setObject(5,this.devicemodelId);
         insertPrepared.setInt(6,this.supervisorId);
 
 
