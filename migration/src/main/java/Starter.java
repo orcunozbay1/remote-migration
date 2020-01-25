@@ -1,18 +1,11 @@
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import entity.AlarmChild;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import remoteentity.*;
 
@@ -507,10 +500,7 @@ public class Starter {
 
 
     }
-    // active = 3534
-    // arrive= 42,786,887
-    // recall= 10,010,057
-    // reset = 19,694
+
     // Alarm ilk oluştuğunda active'e geliyor. arrive a kopyalanıyor.
     private static void saveAlarmsFromControllers(Integer rmSuperVisorId,Integer rmControllerId,Integer sccControllerId) throws SQLException, IOException, ParseException {
 
@@ -649,9 +639,16 @@ public class Starter {
         }
 
 
+        // active = 3534
+        // arrive= 42,786,887
+        // recall= 10,010,057
+        // reset = 19,694
         private static void saveAlarmChild(String parentDocId,ResultSet parentResult) throws ParseException, SQLException {
 
-                // Her bir alarm için oluşturulacak rastgele değerler
+            String viewCode = "";
+
+
+            // Her bir alarm için oluşturulacak rastgele değerler
             Date dateNow = new Date();
             DateFormat format = new SimpleDateFormat(Utility.DATE_FORMAT);
             Date dateFirstDay = format.parse("2019-06-01T00:00:00+0000");
@@ -659,46 +656,20 @@ public class Starter {
                     ThreadLocalRandom.current().nextLong(dateFirstDay.getTime(), dateNow.getTime()));
             Date randomEndDate = new Date(
                     ThreadLocalRandom.current().nextLong(randomStartDate.getTime(), dateNow.getTime()));
-            AlarmChild alarmObject = new AlarmChild();
-            alarmObject.setVariableIndex(parentResult.getInt("variableId"));
-            alarmObject.setControllerId(parentResult.getInt("controllerId"));
-
-            alarmObject.setAlarmType("reset");
-
-            alarmObject.setArrivalTime("2019-06-01T00:00:00+0000"); // her zaman şuanın zamanı kullanılsın
-            alarmObject.setPriority(parentResult.getString("priority")); // variable'ın değeri
-            // ne ise odur.
-            Boolean hasResolutionThisAlarm = new Random().nextBoolean(); // rastgele resolution verelim mi
-
-            alarmObject.setResolution(true);
-            alarmObject.setResolutionMethod("Local Maintenance");
-            alarmObject.setResolutionTime("2019-06-01T00:00:00+0000");
-            alarmObject.setResolvedBy(systemUserId.toString());
-
-            alarmObject.setAcknowledge(true);
-
-            alarmObject.setAcknowledgeTime("2019-06-01T00:00:00+0000");
-            alarmObject.setInhibit(true);
-            alarmObject.setInhibitTime("2019-06-01T00:00:00+0000");
-
-            alarmObject.setWorkingHourStatus("workingHours");
 
             JsonObject alarmContent=new JsonObject();
-            alarmContent.addProperty("alarmType","");
-            alarmContent.addProperty("startTime","");
-            alarmContent.addProperty("arrivalTime","");
+            alarmContent.addProperty("alarmType","reset");
+
             alarmContent.addProperty("priority","");
-            alarmContent.addProperty("parentId","");
+            alarmContent.addProperty("parentId",parentDocId);
             alarmContent.addProperty("workingHourStatus","");
-            alarmContent.addProperty("acknowledge","");
-            alarmContent.addProperty("inhibit","");
-            alarmContent.addProperty("resolution","");
-            alarmContent.addProperty("endTime","");
-            alarmContent.addProperty("resolvedBy","");
-            alarmContent.addProperty("resolutionTime","");
-            alarmContent.addProperty("resolutionMethod","");
-            alarmContent.addProperty("acknowledgeTime","");
-            alarmContent.addProperty("endTime","");
+
+
+
+
+
+            alarmContent=prepareResetAlarm(alarmContent);
+
 
             JsonObject alarmrow = new JsonObject();
             alarmrow.add("alarm-child", alarmContent); // group adı child-alarm olanları json'a çevirelim.
@@ -706,36 +677,32 @@ public class Starter {
             joinFieldJson.addProperty("name", "alarm-child");
             joinFieldJson.addProperty("parent", parentDocId);
             alarmrow.add("join_field", joinFieldJson);
-            IndexRequest returnRequest = new IndexRequest("alarm-parent-index").routing(parentDocId).source(alarmrow.toString(),
-                    XContentType.JSON);
-
+            IndexRequest returnRequest = new IndexRequest("alarm-parent-index").routing(parentDocId).source(alarmrow.toString(), XContentType.JSON);
 
         }
 
-
-        /*PreparedStatement activeStatement=rmConnection.prepareStatement("select * from lgalarmactive");
-        ResultSet activeResult=activeStatement.executeQuery();
-
-        AlarmParent parent=new AlarmParent();
-        while(activeResult.next())
+        private static void prepareActiveAlarm()
         {
-            //Supervisor
 
-            //Platform customer company
+        }
 
-            //Site
+        private static JsonObject prepareResetAlarm(JsonObject alarmContent) throws SQLException {
 
-            //Maintenance Company
+            alarmContent.addProperty("startTime","");
+            alarmContent.addProperty("endTime","");
+            alarmContent.addProperty("arrivalTime","");
+            alarmContent.addProperty("acknowledge","");
+            alarmContent.addProperty("acknowledgeTime","");
+            alarmContent.addProperty("inhibit","");
+            alarmContent.addProperty("inhibitTime","");
 
-            //Variable
+            alarmContent.addProperty("resolution","");
+            alarmContent.addProperty("resolvedBy",systemUserId.toString());
+            alarmContent.addProperty("resolutionTime","");
+            alarmContent.addProperty("resolutionMethod","");
 
-            //Area
-
-//            parent.setAreaId(controller.get.getMaintenanceareaId());
-            parent.setAreaDescription("tanımlanmadı");
-
-        }*/
-
+            return alarmContent;
+        }
 
 
 
