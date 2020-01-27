@@ -19,10 +19,12 @@ import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Starter {
-    static String userName = "postgres";
-    static String password = "gala123456";
-    static String rmUrl = "jdbc:postgresql://178.242.49.250:15432/remote";
-    static String sccUrl = "jdbc:postgresql://178.242.49.250:15432/smartcooling_db";
+    static String targetUserName = "postgresadmin";
+    static String targetPassword = "admin123";
+    static String sourceUserName = "postgres";
+    static String sourcePassword = "gala123456";
+    static String rmUrl = "jdbc:postgresql://192.168.50.180:5432/remote";
+    static String sccUrl = "jdbc:postgresql://192.168.50.137:32101/postgresdb";
 
     static Connection rmConnection = null;
     static Connection sccConnection = null;
@@ -42,22 +44,66 @@ public class Starter {
         //id : 4443
 
 
+        if( System.getProperty("target_postgres")!=null && !System.getProperty("target_postgres").equals(""))
+        {
+            sccUrl=System.getProperty("target_postgres");
+            System.out.println("Target: "+rmUrl);
+        }
+        if( System.getProperty("target_username")!=null && !System.getProperty("target_username").equals(""))
+        {
+            targetUserName=System.getProperty("target_username");
+            System.out.println("Target user: "+targetUserName);
+        }
+        if( System.getProperty("target_password")!=null && !System.getProperty("target_password").equals(""))
+        {
+            targetPassword=System.getProperty("target_password");
+        }
+
+        if( System.getProperty("source_postgres")!=null && !System.getProperty("source_postgres").equals(""))
+        {
+            rmUrl=System.getProperty("source_postgres");
+            System.out.println("Source: "+rmUrl);
+        }
+        if( System.getProperty("source_username")!=null && !System.getProperty("source_username").equals(""))
+        {
+            sourceUserName=System.getProperty("source_username");
+            System.out.println("Source Username: "+ sourceUserName);
+        }
+        if( System.getProperty("source_password")!=null && !System.getProperty("source_password").equals(""))
+        {
+            sourcePassword=System.getProperty("source_password");
+            System.out.println("Source Password: "+sourcePassword);
+        }
+
+
+
+
 
         try {
-            rmConnection = DriverManager.getConnection(rmUrl, userName, password);
-            sccConnection = DriverManager.getConnection(sccUrl, userName, password);
+            rmConnection = DriverManager.getConnection(rmUrl, sourceUserName, sourcePassword);
+            sccConnection = DriverManager.getConnection(sccUrl, targetUserName, targetPassword);
+            createSystemUser();
+//            if(System.getProperty("devicemodel")!=null && System.getProperty("devicemodel").equals("true"))
+//            {
+                saveMasterDeviceModels();
+//            }
+//            if(System.getProperty("company")!=null && System.getProperty("company").equals("true"))
+//            {
+                saveCompanies();
+//            }
+//            if(System.getProperty("area")!=null && System.getProperty("area").equals("true"))
+//            {
+                saveAreas();
+//            }
+//            if(System.getProperty("site")!=null && System.getProperty("site").equals("true"))
+//            {
+                saveSites();
+//            }
 
-           // createSystemUser();
 
-            //saveMasterDeviceModels();
-            //saveCompanies();
-            //saveAreas();
-
-
-            //saveSites();
-
-
-            saveAlarmsFromControllers(null,null,null);
+            if(System.getProperty("alarm")!=null && System.getProperty("alarm").equals("true")) {
+                saveAlarmsFromControllers(null, null, null);
+            }
 
             System.out.println("success");
         }

@@ -14,7 +14,7 @@ public class scc_DeviceModel {
 
 
     public void insert(Connection sccConnection) throws SQLException {
-        String sqlInsertQuery="insert into smartcooling_db.public.device_model(id,description,language,manufacturer,origin,protocol,created_by_id,creationtimestamp,isdeleted)" +
+        String sqlInsertQuery="insert into device_model(id,description,language,manufacturer,origin,protocol,created_by_id,creationtimestamp,isdeleted)" +
                 "values (?,?,?,?,?,?,?,CURRENT_TIMESTAMP,false)";
         PreparedStatement insertPrepared=sccConnection.prepareStatement(sqlInsertQuery);
 
