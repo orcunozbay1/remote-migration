@@ -100,8 +100,8 @@ public class scc_Company {
 
     public void insert(Connection sccConnection) throws SQLException {
         String sqlInsertQuery="INSERT INTO public.company" +
-                "(\"type\", id, address, city, country, email, fax, phone, \"name\", created_by_id,isdeleted,creationtimestamp)" +
-                "VALUES(?,?,?,?,?,?,?,?,?,?,false,CURRENT_TIMESTAMP );";
+                "(\"type\", id, address, city, country, email, fax, phone, \"name\", created_by_id,isdeleted,creationtimestamp,updatetimestamp)" +
+                "VALUES(?,?,?,?,?,?,?,?,?,?,false,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP );";
         PreparedStatement insertPrepared=sccConnection.prepareStatement(sqlInsertQuery);
 
         insertPrepared.setInt(1,this.getType());

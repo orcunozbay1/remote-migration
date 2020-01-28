@@ -79,8 +79,8 @@ public class scc_Variable {
 
     public void insert(Connection sccConnection) throws SQLException {
         String sqlInsertQuery="insert into variable" +
-                "(id, variable_key, color, creationtimestamp, haccp, category, combo, enumvalue, imageoff, imageon, iscommand, hsdelta, hsfrequency, hstime, priority, relay, todisplay, avalue, bvalue, bitposition, dimension, length, varencoding, inaddress, inaddress_functiontype, inaddress_index, outaddress, outaddress_functiontype, outaddress_index,  \"decimal\", defaultvalue, maximum, measureunit, minimum, signed, \"type\", created_by_id, device_model_id) " +
-                "values (?, ?, ?, CURRENT_TIMESTAMP , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                "(id, variable_key, color, creationtimestamp, haccp, category, combo, enumvalue, imageoff, imageon, iscommand, hsdelta, hsfrequency, hstime, priority, relay, todisplay, avalue, bvalue, bitposition, dimension, length, varencoding, inaddress, inaddress_functiontype, inaddress_index, outaddress, outaddress_functiontype, outaddress_index,  \"decimal\", defaultvalue, maximum, measureunit, minimum, signed, \"type\", created_by_id, device_model_id,updatetimestamp) " +
+                "values (?, ?, ?, CURRENT_TIMESTAMP , ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,CURRENT_TIMESTAMP );";
         PreparedStatement insertPrepared=sccConnection.prepareStatement(sqlInsertQuery);
 
         insertPrepared.setInt(1,this.id);

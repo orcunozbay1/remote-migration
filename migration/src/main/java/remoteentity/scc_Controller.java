@@ -110,8 +110,8 @@ public class scc_Controller {
 
     public void insert(Connection sccConnection) throws SQLException {
         String query="INSERT INTO public.controller\n" +
-                "(id, creationtimestamp, description, isactive,  \"name\",  created_by_id,  devicemodel_id, supervisor_id)" +
-                "VALUES(?,CURRENT_TIMESTAMP ,?,TRUE ,?,?,?,?);";
+                "(id, creationtimestamp, description, isactive,  \"name\",  created_by_id,  devicemodel_id, supervisor_id,updatetimestamp)" +
+                "VALUES(?,CURRENT_TIMESTAMP ,?,TRUE ,?,?,?,?,CURRENT_TIMESTAMP );";
         PreparedStatement insertPrepared=sccConnection.prepareStatement(query);
         insertPrepared.setInt(1,this.id);
         insertPrepared.setString(2,this.description);

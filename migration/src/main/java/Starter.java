@@ -26,6 +26,7 @@ public class Starter {
     static String rmUrl = "jdbc:postgresql://192.168.50.180:5432/remote";
     static String sccUrl = "jdbc:postgresql://192.168.50.137:32101/postgresdb";
 
+
     static Connection rmConnection = null;
     static Connection sccConnection = null;
 
@@ -82,28 +83,28 @@ public class Starter {
         try {
             rmConnection = DriverManager.getConnection(rmUrl, sourceUserName, sourcePassword);
             sccConnection = DriverManager.getConnection(sccUrl, targetUserName, targetPassword);
-            createSystemUser();
+           // createSystemUser();
 //            if(System.getProperty("devicemodel")!=null && System.getProperty("devicemodel").equals("true"))
 //            {
-                saveMasterDeviceModels();
+//                saveMasterDeviceModels();
 //            }
 //            if(System.getProperty("company")!=null && System.getProperty("company").equals("true"))
 //            {
-                saveCompanies();
+//                saveCompanies();
 //            }
 //            if(System.getProperty("area")!=null && System.getProperty("area").equals("true"))
 //            {
-                saveAreas();
+//                saveAreas();
 //            }
 //            if(System.getProperty("site")!=null && System.getProperty("site").equals("true"))
 //            {
-                saveSites();
+//                saveSites();
 //            }
 
 
-            if(System.getProperty("alarm")!=null && System.getProperty("alarm").equals("true")) {
+//            if(System.getProperty("alarm")!=null && System.getProperty("alarm").equals("true")) {
                 saveAlarmsFromControllers(null, null, null);
-            }
+//            }
 
             System.out.println("success");
         }
@@ -131,6 +132,11 @@ public class Starter {
 
     } //fstaf msfvw
 
+
+
+
+
+
     private static void saveCompanies() throws SQLException {
 
         //migros ve cfm el ile oluşturuyoruz
@@ -157,7 +163,7 @@ public class Starter {
         customerCompany.setPhone(null);
         customerCompany.setName("MIGROS");
         customerCompany.setCreatedById(systemUserId);
-        customerCompany.setType(2);
+        customerCompany.setType(1);
         customerCompany.insert(sccConnection);
         defaultCustomer=customerCompany.getId();
 
@@ -171,7 +177,7 @@ public class Starter {
         customerCompany.setPhone(null);
         customerCompany.setName("KIPA");
         customerCompany.setCreatedById(systemUserId);
-        customerCompany.setType(2);
+        customerCompany.setType(1);
         customerCompany.insert(sccConnection);
 
 
@@ -185,7 +191,7 @@ public class Starter {
         customerCompany.setPhone(null);
         customerCompany.setName("Default Maintenance Company");
         customerCompany.setCreatedById(systemUserId);
-        customerCompany.setType(1);
+        customerCompany.setType(2);
         customerCompany.insert(sccConnection);
         defaultMaintainer=customerCompany.getId();
 
@@ -213,7 +219,7 @@ public class Starter {
             newCompany.setPhone(companiesResult_company.getString("phone"));
             newCompany.setName(companiesResult_area.getString("description"));
             newCompany.setCreatedById(systemUserId);
-            newCompany.setType(1);
+            newCompany.setType(2);
             newCompany.insert(sccConnection);
         }
 
@@ -224,7 +230,7 @@ public class Starter {
 
     private static void saveSites() throws SQLException, IOException, ParseException {
         //Company tarafından başlık bilgisini alıp supervisorden site bilgisini birleştirip site olarak atacağız.
-        PreparedStatement statement=rmConnection.prepareStatement("select * from public.cfcompany where pcomptype='PNT' and karea <>'CFM'");
+        PreparedStatement statement=rmConnection.prepareStatement("select * from cfcompany where pcomptype='PNT' and karea <>'CFM'");
         ResultSet companySiteResult=statement.executeQuery();
         while(companySiteResult.next()) // her bir satır 1 site olarak eklenecek.
         {
@@ -293,11 +299,12 @@ public class Starter {
     private static void createSystemUser() throws SQLException {
         systemUserId= Math.toIntExact(nextId("user"));
         String userQuery="INSERT INTO public.\"user\"\n" +
-                "(id, isdeleted, \"language\", \"name\", status, surname) " +
-                "VALUES(?,false,'TR','Import System',true,'User');";
+                "(id, isdeleted, \"language\",timezone, \"name\", status, surname,email,company_id) " +
+                "VALUES(?,false,'tr','tr','Import System',true,'User','test@email.com',?);";
 
         PreparedStatement statement=sccConnection.prepareStatement(userQuery);
         statement.setInt(1,systemUserId);
+        statement.setInt(2,defaultCustomer);
         statement.executeUpdate();
 
 
@@ -332,6 +339,7 @@ public class Starter {
             newSupervisor.setSiteId(sccSite);
             newSupervisor.setCreatedById(systemUserId);
             newSupervisor.setMaintenanceareaId(defaultMaintenanceArea);
+            newSupervisor.setSupervisortype((supervisorResult.getString("ktype").equals("PCW"))?"pcoweb":supervisorResult.getString("ktype"));
             newSupervisor.insert(sccConnection);
             saveController(supervisorResult.getInt("id"), newSupervisor.getId());
         }
@@ -653,7 +661,7 @@ public class Starter {
             }
 
             //Alarm child ayarları
-            saveAlarmChild(parentDocId,parentResult);
+            saveAlarmChild(parentDocId,rmSuperVisorId,rmControllerId);
 
 
 
@@ -689,41 +697,62 @@ public class Starter {
         // arrive= 42,786,887
         // recall= 10,010,057
         // reset = 19,694
-        private static void saveAlarmChild(String parentDocId,ResultSet parentResult) throws ParseException, SQLException {
+        private static void saveAlarmChild(String parentDocId,Integer rmSupervisor, Integer rmController) throws ParseException, SQLException {
 
-            String viewCode = "";
+            String viewCode = "select \n" +
+                    "recall.starttime,\n" +
+                    "recall.endtime,\n" +
+                    "arrive.inserttime as arrivaltime,\n" +
+                    "recall.ackremotetime as acknowledgetime,\n" +
+                    "reset.recallresettime as inhibittime,\n" +
+                    "arrive.usespare as resolution \n" +
+                    "\n" +
+                    "from lgalarmrecall recall\n" +
+                    "inner join cfsupervisors sup on sup.id =recall.kidsupervisor\n" +
+                    "inner join lgdevice cont on cont.kidsupervisor =sup.id and recall.iddevice =cont.iddevice and cont.isenabled ='TRUE'\n" +
+                    "left join lgalarmarrive arrive on arrive.kidsupervisor =recall .kidsupervisor and recall .idalarm =arrive.idalarm \n" +
+                    "left join lgalarmreset reset on reset.idalarmreset =arrive .idalarm \n" +
+                    "\n" +
+                    "where sup.id=? and cont.iddevice=? ";
+
+            PreparedStatement statement = rmConnection.prepareStatement(viewCode);
+            statement.setInt(1,rmSupervisor);
+            statement.setInt(2,rmController);
+            ResultSet result=statement.executeQuery();
+            while(result.next())
+            {
+
+                // Her bir alarm için oluşturulacak rastgele değerler
+                Date dateNow = new Date();
+                DateFormat format = new SimpleDateFormat(Utility.DATE_FORMAT);
+                Date dateFirstDay = format.parse("2019-06-01T00:00:00+0000");
+                Date randomStartDate = new Date(
+                        ThreadLocalRandom.current().nextLong(dateFirstDay.getTime(), dateNow.getTime()));
+                Date randomEndDate = new Date(
+                        ThreadLocalRandom.current().nextLong(randomStartDate.getTime(), dateNow.getTime()));
+
+                JsonObject alarmContent=new JsonObject();
+                alarmContent.addProperty("alarmType","reset");
+
+                alarmContent.addProperty("priority","");
+                alarmContent.addProperty("parentId",parentDocId);
+                alarmContent.addProperty("workingHourStatus","");
 
 
-            // Her bir alarm için oluşturulacak rastgele değerler
-            Date dateNow = new Date();
-            DateFormat format = new SimpleDateFormat(Utility.DATE_FORMAT);
-            Date dateFirstDay = format.parse("2019-06-01T00:00:00+0000");
-            Date randomStartDate = new Date(
-                    ThreadLocalRandom.current().nextLong(dateFirstDay.getTime(), dateNow.getTime()));
-            Date randomEndDate = new Date(
-                    ThreadLocalRandom.current().nextLong(randomStartDate.getTime(), dateNow.getTime()));
-
-            JsonObject alarmContent=new JsonObject();
-            alarmContent.addProperty("alarmType","reset");
-
-            alarmContent.addProperty("priority","");
-            alarmContent.addProperty("parentId",parentDocId);
-            alarmContent.addProperty("workingHourStatus","");
 
 
 
+                alarmContent=prepareResetAlarm(alarmContent,result);
 
 
-            alarmContent=prepareResetAlarm(alarmContent);
-
-
-            JsonObject alarmrow = new JsonObject();
-            alarmrow.add("alarm-child", alarmContent); // group adı child-alarm olanları json'a çevirelim.
-            JsonObject joinFieldJson = new JsonObject();
-            joinFieldJson.addProperty("name", "alarm-child");
-            joinFieldJson.addProperty("parent", parentDocId);
-            alarmrow.add("join_field", joinFieldJson);
-            IndexRequest returnRequest = new IndexRequest("alarm-parent-index").routing(parentDocId).source(alarmrow.toString(), XContentType.JSON);
+                JsonObject alarmrow = new JsonObject();
+                alarmrow.add("alarm-child", alarmContent); // group adı child-alarm olanları json'a çevirelim.
+                JsonObject joinFieldJson = new JsonObject();
+                joinFieldJson.addProperty("name", "alarm-child");
+                joinFieldJson.addProperty("parent", parentDocId);
+                alarmrow.add("join_field", joinFieldJson);
+                IndexRequest returnRequest = new IndexRequest("alarm-parent-index").routing(parentDocId).source(alarmrow.toString(), XContentType.JSON);
+            }
 
         }
 
@@ -732,20 +761,34 @@ public class Starter {
 
         }
 
-        private static JsonObject prepareResetAlarm(JsonObject alarmContent) throws SQLException {
+        private static JsonObject prepareResetAlarm(JsonObject alarmContent,ResultSet childResult) throws SQLException {
 
-            alarmContent.addProperty("startTime","");
-            alarmContent.addProperty("endTime","");
-            alarmContent.addProperty("arrivalTime","");
-            alarmContent.addProperty("acknowledge","");
-            alarmContent.addProperty("acknowledgeTime","");
-            alarmContent.addProperty("inhibit","");
-            alarmContent.addProperty("inhibitTime","");
+            String acknowledteTime=null;
+            String inhibitTime=null;
+            String resolutionTime=null;
+            String resolutionMethod=null;
+            if(childResult.getTimestamp("acknowledgetime")!=null && !childResult.getTimestamp("acknowledgetime").equals("") )
+                acknowledteTime= Utility.getFormattedDate(String.valueOf(childResult.getTimestamp("acknowledgetime")));
+            if(childResult.getTimestamp("inhibittime")!=null && !childResult.getTimestamp("inhibittime").equals("") )
+                inhibitTime=Utility.getFormattedDate(String.valueOf(childResult.getTimestamp("inhibittime")));
+            if(childResult.getTimestamp("resolution")!=null && !childResult.getTimestamp("resolution").equals("") )
+                resolutionTime=new SimpleDateFormat(Utility.DATE_FORMAT).format(new Date(0));
 
-            alarmContent.addProperty("resolution","");
+
+            alarmContent.addProperty("startTime",Utility.getFormattedDate(String.valueOf(childResult.getTimestamp("starttime"))));
+            alarmContent.addProperty("endTime",Utility.getFormattedDate(String.valueOf(childResult.getTimestamp("endtime"))));
+            alarmContent.addProperty("arrivalTime",Utility.getFormattedDate(String.valueOf(childResult.getTimestamp("arrivaltime"))));
+
+                alarmContent.addProperty("acknowledge", (acknowledteTime!=null));
+            alarmContent.addProperty("acknowledgeTime",acknowledteTime);
+            alarmContent.addProperty("inhibit",(inhibitTime!=null));
+            alarmContent.addProperty("inhibitTime",inhibitTime);
+
+            alarmContent.addProperty("resolution",(resolutionTime!=null));
             alarmContent.addProperty("resolvedBy",systemUserId.toString());
-            alarmContent.addProperty("resolutionTime","");
-            alarmContent.addProperty("resolutionMethod","");
+            alarmContent.addProperty("resolutionTime",resolutionTime);
+            if(resolutionTime!=null)
+                alarmContent.addProperty("resolutionMethod",resolutionMethod);
 
             return alarmContent;
         }

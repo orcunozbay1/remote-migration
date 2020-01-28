@@ -213,8 +213,8 @@ public class scc_Site {
 
     public void insert(Connection sccConnection) throws SQLException {
         String query="INSERT INTO public.site " +
-                "(id, address, city, country, email, fax, phone, description,  latitude,  longitude, \"name\", created_by_id, maintenancearea_id, platformcustomer_id, isdeleted,creationtimestamp) " +
-                "VALUES(?, ?,?,?,?,?,?,?,?,?,?,?,?,?,false, CURRENT_TIMESTAMP);";
+                "(id, address, city, country, email, fax, phone, description,  latitude,  longitude, \"name\", created_by_id, maintenancearea_id, platformcustomer_id, isdeleted,creationtimestamp,updatetimestamp) " +
+                "VALUES(?, ?,?,?,?,?,?,?,?,?,?,?,?,?,false, CURRENT_TIMESTAMP,CURRENT_TIMESTAMP );";
         PreparedStatement insertPrepared=sccConnection.prepareStatement(query);
         insertPrepared.setInt(1,this.id);
         insertPrepared.setString(2,this.address);

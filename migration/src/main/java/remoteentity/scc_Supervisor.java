@@ -59,6 +59,7 @@ public class scc_Supervisor {
     private Integer maintenanceareaId;
     private Integer siteId;
     private Integer createdById;
+    private String supervisortype;
 
     public int getId() {
         return id;
@@ -308,26 +309,36 @@ public class scc_Supervisor {
         this.createdById = createdById;
     }
 
+    public String getSupervisortype() {
+        return supervisortype;
+    }
+
+    public void setSupervisortype(String supervisortype) {
+        this.supervisortype = supervisortype;
+    }
+
     public void insert(Connection sccConnection) throws SQLException {
-        String query="INSERT INTO public.supervisor(id, connectiontype, identifier, ip_adress, \"language\", macaddress, \"password\", creationtimestamp, description, " +
-                "ftp_password, ftp_username,  http_password, http_username,  isdeleted, \"type\", created_by_id,  site_id)" +
-                "VALUES(?,?,?,?,?,?,?,CURRENT_TIMESTAMP ,?,?,?,?,?,false,?,?,?);";
+        String query="INSERT INTO public.supervisor(id, connectiontype, maintenancearea_id ,identifier, ip_adress, \"language\", macaddress, \"password\", creationtimestamp, description, " +
+                "ftp_password, ftp_username,  http_password, http_username,  isdeleted, \"type\", created_by_id,  site_id,supervisortype,updatetimestamp)" +
+                "VALUES(?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP ,?,?,?,?,?,false,?,?,?,?,CURRENT_TIMESTAMP );";
         PreparedStatement insertPrepared=sccConnection.prepareStatement(query);
         insertPrepared.setInt(1,this.id);
         insertPrepared.setString(2,this.connectiontype);
-        insertPrepared.setString(3,this.identifier);
-        insertPrepared.setString(4,this.ipAdress);
-        insertPrepared.setString(5,this.language);
-        insertPrepared.setString(6,this.macaddress);
-        insertPrepared.setString(7,this.password);
-        insertPrepared.setObject(8,this.description);
-        insertPrepared.setObject(9,this.ftpPassword);
-        insertPrepared.setString(10,this.ftpUsername);
-        insertPrepared.setString(11,this.httpPassword);
-        insertPrepared.setObject(12,this.httpUsername);
-        insertPrepared.setString(13,this.type);
-        insertPrepared.setInt(14,this.createdById);
-        insertPrepared.setInt(15,this.siteId);
+        insertPrepared.setInt(3,this.maintenanceareaId);
+        insertPrepared.setString(4,this.identifier);
+        insertPrepared.setString(5,this.ipAdress);
+        insertPrepared.setString(6,this.language);
+        insertPrepared.setString(7,this.macaddress);
+        insertPrepared.setString(8,this.password);
+        insertPrepared.setObject(9,this.description);
+        insertPrepared.setObject(10,this.ftpPassword);
+        insertPrepared.setString(11,this.ftpUsername);
+        insertPrepared.setString(12,this.httpPassword);
+        insertPrepared.setObject(13,this.httpUsername);
+        insertPrepared.setString(14,this.type);
+        insertPrepared.setInt(15,this.createdById);
+        insertPrepared.setInt(16,this.siteId);
+        insertPrepared.setString(17,this.supervisortype);
 
         insertPrepared.executeUpdate();
 

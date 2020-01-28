@@ -71,8 +71,8 @@ public class scc_MaintenanceArea {
     }
 
     public void insert(Connection sccConnection) throws SQLException {
-        String query="INSERT INTO maintenance_area(id, description, isdeleted, name, maintenance_operator_id,  platform_company_id, creationtimestamp,  created_by_id)" +
-                "VALUES(?,?,false,?,?,?,current_timestamp ,?);";
+        String query="INSERT INTO maintenance_area(id, description, isdeleted, name, maintenance_operator_id,  platform_company_id, creationtimestamp,  created_by_id,updatetimestamp)" +
+                "VALUES(?,?,false,?,?,?,current_timestamp ,?,CURRENT_TIMESTAMP );";
         PreparedStatement insertPrepared=sccConnection.prepareStatement(query);
         insertPrepared.setInt(1,this.id);
         insertPrepared.setString(2,this.description);

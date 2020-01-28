@@ -14,8 +14,8 @@ public class scc_DeviceModel {
 
 
     public void insert(Connection sccConnection) throws SQLException {
-        String sqlInsertQuery="insert into device_model(id,description,language,manufacturer,origin,protocol,created_by_id,creationtimestamp,isdeleted)" +
-                "values (?,?,?,?,?,?,?,CURRENT_TIMESTAMP,false)";
+        String sqlInsertQuery="insert into device_model(id,description,language,manufacturer,origin,protocol,created_by_id,creationtimestamp,isdeleted,updatetimestamp)" +
+                "values (?,?,?,?,?,?,?,CURRENT_TIMESTAMP,false,CURRENT_TIMESTAMP )";
         PreparedStatement insertPrepared=sccConnection.prepareStatement(sqlInsertQuery);
 
         insertPrepared.setInt(1,this.id);
