@@ -9,23 +9,23 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import remoteentity.*;
 
-import javax.swing.plaf.nimbus.State;
 import java.io.IOException;
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Starter {
-    static String targetUserName = "postgres";
-    static String targetPassword = "gala123456";
+    static String targetUserName = "postgresadmin";
+    static String targetPassword = "admin123";
     static String sourceUserName = "postgres";
     static String sourcePassword = "gala123456";
-    static String rmUrl = "jdbc:postgresql://178.242.49.250:15432/remote";
-    static String sccUrl = "jdbc:postgresql://178.242.49.250:15432/smartcooling_db";
+    static String rmUrl = "jdbc:postgresql://192.168.50.180:5432/remote";
+    static String sccUrl = "jdbc:postgresql://192.168.50.137:32101/postgresdb";
 
 
     static Connection rmConnection = null;
