@@ -28,18 +28,28 @@ public class Utility {
         return esClient;
     }
 
-    public static String getFormattedDate(String dateString)
-    {
+    public static String getFormattedDate(String dateString) throws ParseException {
+        //2019-07-17 23:45:27
+        SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZZ");
+        format2.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date date = format1.parse(dateString);
+        return format2.format(date);
+
+        /*
+        SimpleDateFormat OldDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date oldDate=OldDateFormat.parse(dateString);
+
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = null;
         try {
-            date = dateFormat.parse(dateString);
+            date = dateFormat.parse(oldDate());
         } catch (ParseException e) {
             System.out.println("Error occured while parsing datetime. Please check format or date string");
         }
         String formattedDate = dateFormat.format(date);
-        return formattedDate;
+        return formattedDate;*/
     }
 
 

@@ -9,6 +9,7 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import remoteentity.*;
 
+import javax.swing.plaf.nimbus.State;
 import java.io.IOException;
 import java.sql.*;
 import java.text.DateFormat;
@@ -19,12 +20,12 @@ import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Starter {
-    static String targetUserName = "postgresadmin";
-    static String targetPassword = "admin123";
+    static String targetUserName = "postgres";
+    static String targetPassword = "gala123456";
     static String sourceUserName = "postgres";
     static String sourcePassword = "gala123456";
-    static String rmUrl = "jdbc:postgresql://192.168.50.180:5432/remote";
-    static String sccUrl = "jdbc:postgresql://192.168.50.137:32101/postgresdb";
+    static String rmUrl = "jdbc:postgresql://178.242.49.250:15432/remote";
+    static String sccUrl = "jdbc:postgresql://178.242.49.250:15432/smartcooling_db";
 
 
     static Connection rmConnection = null;
@@ -83,7 +84,10 @@ public class Starter {
         try {
             rmConnection = DriverManager.getConnection(rmUrl, sourceUserName, sourcePassword);
             sccConnection = DriverManager.getConnection(sccUrl, targetUserName, targetPassword);
-           // createSystemUser();
+
+//            createSequence();
+
+//            createSystemUser();
 //            if(System.getProperty("devicemodel")!=null && System.getProperty("devicemodel").equals("true"))
 //            {
 //                saveMasterDeviceModels();
@@ -98,12 +102,12 @@ public class Starter {
 //            }
 //            if(System.getProperty("site")!=null && System.getProperty("site").equals("true"))
 //            {
-//                saveSites();
+                saveSites();
 //            }
 
 
 //            if(System.getProperty("alarm")!=null && System.getProperty("alarm").equals("true")) {
-                saveAlarmsFromControllers(null, null, null);
+                //saveAlarmsFromControllers(4213, 4213, null);
 //            }
 
             System.out.println("success");
@@ -132,16 +136,18 @@ public class Starter {
 
     } //fstaf msfvw
 
-
-
-
+    private static void createSequence() throws SQLException {
+        Statement sequenceStatement = sccConnection.createStatement();
+        sequenceStatement.executeQuery("DROP SEQUENCE IF EXISTS nextid;");
+        sequenceStatement.executeQuery("create sequence nextid as int start with 10000");
+    }
 
 
     private static void saveCompanies() throws SQLException {
 
         //migros ve cfm el ile oluşturuyoruz
         scc_Company ownerCompany=new scc_Company();
-        ownerCompany.setId(Math.toIntExact(nextId("company")));
+        ownerCompany.setId(Math.toIntExact(nextId()));
         ownerCompany.setAddress("A.O.S.B 10044 Sk. No 9");
         ownerCompany.setCity("Izmir");
         ownerCompany.setCountry("Turkey");
@@ -154,7 +160,7 @@ public class Starter {
         ownerCompany.insert(sccConnection);
 
         scc_Company customerCompany=new scc_Company();
-        customerCompany.setId(Math.toIntExact(nextId("company")));
+        customerCompany.setId(Math.toIntExact(nextId()));
         customerCompany.setAddress("İstanbul Merkez");
         customerCompany.setCity("İstanbul");
         customerCompany.setCountry("Turkey");
@@ -168,7 +174,7 @@ public class Starter {
         defaultCustomer=customerCompany.getId();
 
         customerCompany=new scc_Company();
-        customerCompany.setId(Math.toIntExact(nextId("company")));
+        customerCompany.setId(Math.toIntExact(nextId()));
         customerCompany.setAddress("İstanbul Merkez");
         customerCompany.setCity("İstanbul");
         customerCompany.setCountry("Turkey");
@@ -182,7 +188,7 @@ public class Starter {
 
 
         customerCompany=new scc_Company();
-        customerCompany.setId(Math.toIntExact(nextId("company")));
+        customerCompany.setId(Math.toIntExact(nextId()));
         customerCompany.setAddress("Default Address");
         customerCompany.setCity("Izmir");
         customerCompany.setCountry("Turkey");
@@ -210,7 +216,7 @@ public class Starter {
                 continue;
 
             scc_Company newCompany=new scc_Company();
-            newCompany.setId(Math.toIntExact(nextId("company")));
+            newCompany.setId(Math.toIntExact(nextId()));
             newCompany.setAddress(companiesResult_company.getString("address"));
             newCompany.setCity(companiesResult_company.getString("city"));
             newCompany.setCountry(companiesResult_company.getString("country"));
@@ -265,7 +271,7 @@ public class Starter {
 
 
             scc_Site newSite=new scc_Site();
-            newSite.setId(Math.toIntExact(nextId("site")));
+            newSite.setId(Math.toIntExact(nextId()));
             newSite.setAddress(companySiteResult.getString("address"));
             newSite.setCity(companySiteResult.getString("city"));
             newSite.setCountry(companySiteResult.getString("country"));
@@ -297,7 +303,7 @@ public class Starter {
     }
 
     private static void createSystemUser() throws SQLException {
-        systemUserId= Math.toIntExact(nextId("user"));
+        systemUserId= Math.toIntExact(nextId());
         String userQuery="INSERT INTO public.\"user\"\n" +
                 "(id, isdeleted, \"language\",timezone, \"name\", status, surname,email,company_id) " +
                 "VALUES(?,false,'tr','tr','Import System',true,'User','test@email.com',?);";
@@ -312,12 +318,12 @@ public class Starter {
 
     }
 
-    private static Long nextId(String tableName) throws SQLException {
-        PreparedStatement maxIdStatement=sccConnection.prepareStatement("select max(id) as last_id from \""+tableName+"\"");
-        ResultSet idResult=maxIdStatement.executeQuery();
+    private static Long nextId() throws SQLException {
+        Statement nextIdStatement=sccConnection.createStatement();
+        ResultSet idResult=nextIdStatement.executeQuery("select nextval('nextid') as id");
         idResult.next();
-        Long lastid=idResult.getLong("last_id");
-        return lastid+1;
+        Long lastid=idResult.getLong("id");
+        return lastid;
     }
 
 
@@ -329,7 +335,7 @@ public class Starter {
 
         while (supervisorResult.next())
         {
-            newSupervisor.setId(Math.toIntExact(nextId("supervisor")));
+            newSupervisor.setId(Math.toIntExact(nextId()));
             newSupervisor.setDescription(supervisorResult.getString("description"));
             newSupervisor.setFtpUsername(supervisorResult.getString("cuser"));
             newSupervisor.setFtpPassword(supervisorResult.getString("password"));
@@ -380,7 +386,7 @@ public class Starter {
 
 
              scc_Controller controller = new scc_Controller();
-             controller.setId(Math.toIntExact(nextId("controller")));
+             controller.setId(Math.toIntExact(nextId()));
              controller.setDescription(controllers.getString("description"));
              controller.setName( controllers.getString("description"));
              controller.setDevicemodelId(newDeviceModelId);
@@ -416,7 +422,7 @@ public class Starter {
         while(rmdevicemodels.next())
         {
             scc_DeviceModel deviceModel=new scc_DeviceModel();
-            deviceModel.setId(Math.toIntExact(nextId("device_model")));
+            deviceModel.setId(Math.toIntExact(nextId()));
             deviceModel.setLanguage("TR");
             deviceModel.setDescription(rmdevicemodels.getString("description"));
             deviceModel.setManufacturer(rmdevicemodels.getString("manufacturer"));
@@ -456,7 +462,7 @@ public class Starter {
         while(rmvariable.next())
         {
             scc_Variable sccVariable = new scc_Variable();
-            sccVariable.setId(Math.toIntExact(nextId("variable")));
+            sccVariable.setId(Math.toIntExact(nextId()));
             sccVariable.setBitposition(rmvariable.getInt("bitposition"));
             //sccVariable.setVariableKey(rmVariable);
             //                    sccVariable.setColor(rmVariable.get);
@@ -542,7 +548,7 @@ public class Starter {
 
     private static void saveAreas() throws SQLException {
         scc_MaintenanceArea newArea=new scc_MaintenanceArea();
-        newArea.setId(Math.toIntExact(nextId("maintenance_area")));
+        newArea.setId(Math.toIntExact(nextId()));
         newArea.setName("Default Area");
         newArea.setDescription("Default Area for new records");
         newArea.setPlatformCompanyId(defaultCustomer);//migros
@@ -697,7 +703,7 @@ public class Starter {
         // arrive= 42,786,887
         // recall= 10,010,057
         // reset = 19,694
-        private static void saveAlarmChild(String parentDocId,Integer rmSupervisor, Integer rmController) throws ParseException, SQLException {
+        private static void saveAlarmChild(String parentDocId,Integer rmSupervisor, Integer rmController) throws ParseException, SQLException, IOException {
 
             String viewCode = "select \n" +
                     "recall.starttime,\n" +
@@ -719,6 +725,7 @@ public class Starter {
             statement.setInt(1,rmSupervisor);
             statement.setInt(2,rmController);
             ResultSet result=statement.executeQuery();
+            BulkRequest request = new BulkRequest();
             while(result.next())
             {
 
@@ -734,7 +741,6 @@ public class Starter {
                 JsonObject alarmContent=new JsonObject();
                 alarmContent.addProperty("alarmType","reset");
 
-                alarmContent.addProperty("priority","");
                 alarmContent.addProperty("parentId",parentDocId);
                 alarmContent.addProperty("workingHourStatus","");
 
@@ -752,7 +758,9 @@ public class Starter {
                 joinFieldJson.addProperty("parent", parentDocId);
                 alarmrow.add("join_field", joinFieldJson);
                 IndexRequest returnRequest = new IndexRequest("alarm-parent-index").routing(parentDocId).source(alarmrow.toString(), XContentType.JSON);
+                request.add(returnRequest);
             }
+            BulkResponse bulkResponse = Utility.getElasticSearchClient().bulk(request, RequestOptions.DEFAULT);
 
         }
 
@@ -761,7 +769,7 @@ public class Starter {
 
         }
 
-        private static JsonObject prepareResetAlarm(JsonObject alarmContent,ResultSet childResult) throws SQLException {
+        private static JsonObject prepareResetAlarm(JsonObject alarmContent,ResultSet childResult) throws SQLException, ParseException {
 
             String acknowledteTime=null;
             String inhibitTime=null;
