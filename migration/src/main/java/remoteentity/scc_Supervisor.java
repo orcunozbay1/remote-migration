@@ -319,8 +319,8 @@ public class scc_Supervisor {
 
     public void insert(Connection sccConnection) throws SQLException {
         String query="INSERT INTO public.supervisor(id, connectiontype, maintenancearea_id ,identifier, ip_adress, \"language\", macaddress, \"password\", creationtimestamp, description, " +
-                "ftp_password, ftp_username,  http_password, http_username,  isdeleted, \"type\", created_by_id,  site_id,supervisortype,updatetimestamp)" +
-                "VALUES(?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP ,?,?,?,?,?,false,?,?,?,?,CURRENT_TIMESTAMP );";
+                "ftp_password, ftp_username,  http_password, http_username,  isdeleted, \"type\", created_by_id,  site_id,updatetimestamp)" +
+                "VALUES(?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP ,?,?,?,?,?,false,?,?,?,CURRENT_TIMESTAMP );";
         PreparedStatement insertPrepared=sccConnection.prepareStatement(query);
         insertPrepared.setInt(1,this.id);
         insertPrepared.setString(2,this.connectiontype);
@@ -338,7 +338,7 @@ public class scc_Supervisor {
         insertPrepared.setString(14,this.type);
         insertPrepared.setInt(15,this.createdById);
         insertPrepared.setInt(16,this.siteId);
-        insertPrepared.setString(17,this.supervisortype);
+        //insertPrepared.setString(17,this.supervisortype);
 
         insertPrepared.executeUpdate();
 

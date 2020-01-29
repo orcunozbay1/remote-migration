@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Starter {
-    static String targetUserName = "postgresadmin";
-    static String targetPassword = "admin123";
+    static String targetUserName = "postgres";
+    static String targetPassword = "gala123456";
     static String sourceUserName = "postgres";
     static String sourcePassword = "gala123456";
-    static String rmUrl = "jdbc:postgresql://192.168.50.180:5432/remote";
-    static String sccUrl = "jdbc:postgresql://192.168.50.137:32101/postgresdb";
+    static String rmUrl = "jdbc:postgresql://178.242.49.250:15432/remote";
+    static String sccUrl = "jdbc:postgresql://178.242.49.250:15432/smartcooling_db";
 
 
     static Connection rmConnection = null;
@@ -85,20 +85,20 @@ public class Starter {
             rmConnection = DriverManager.getConnection(rmUrl, sourceUserName, sourcePassword);
             sccConnection = DriverManager.getConnection(sccUrl, targetUserName, targetPassword);
 
-//            createSequence();
+            createSequence();
 
-//            createSystemUser();
+            createSystemUser();
 //            if(System.getProperty("devicemodel")!=null && System.getProperty("devicemodel").equals("true"))
 //            {
-//                saveMasterDeviceModels();
+                saveMasterDeviceModels();
 //            }
 //            if(System.getProperty("company")!=null && System.getProperty("company").equals("true"))
 //            {
-//                saveCompanies();
+                saveCompanies();
 //            }
 //            if(System.getProperty("area")!=null && System.getProperty("area").equals("true"))
 //            {
-//                saveAreas();
+                saveAreas();
 //            }
 //            if(System.getProperty("site")!=null && System.getProperty("site").equals("true"))
 //            {
@@ -335,6 +335,12 @@ public class Starter {
 
         while (supervisorResult.next())
         {
+            //SCC FIX
+            if(!(supervisorResult.getString("ktype").equals("PCW") || supervisorResult.getString("ktype").equals("boss")))
+            {
+                continue;
+            }
+
             newSupervisor.setId(Math.toIntExact(nextId()));
             newSupervisor.setDescription(supervisorResult.getString("description"));
             newSupervisor.setFtpUsername(supervisorResult.getString("cuser"));
@@ -345,7 +351,7 @@ public class Starter {
             newSupervisor.setSiteId(sccSite);
             newSupervisor.setCreatedById(systemUserId);
             newSupervisor.setMaintenanceareaId(defaultMaintenanceArea);
-            newSupervisor.setSupervisortype((supervisorResult.getString("ktype").equals("PCW"))?"pcoweb":supervisorResult.getString("ktype"));
+            newSupervisor.setType((supervisorResult.getString("ktype").equals("PCW"))?"pcoweb":supervisorResult.getString("ktype"));
             newSupervisor.insert(sccConnection);
             saveController(supervisorResult.getInt("id"), newSupervisor.getId());
         }
