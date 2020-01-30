@@ -285,7 +285,7 @@ public class Starter {
             newSite.setLongitude(longitude);
             newSite.setCreatedById(systemUserId);
             newSite.setPlatformcustomerId(companyId);
-            newSite.setMaintenanceareaId(null);
+            newSite.setMaintenanceareaId(defaultMaintenanceArea);
 
             newSite.insert(sccConnection);
 
