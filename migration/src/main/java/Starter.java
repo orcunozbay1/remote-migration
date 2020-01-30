@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Starter {
-    static String targetUserName = "postgres";
-    static String targetPassword = "gala123456";
+    static String targetUserName = "postgresadmin";
+    static String targetPassword = "admin123";
     static String sourceUserName = "postgres";
     static String sourcePassword = "gala123456";
-    static String rmUrl = "jdbc:postgresql://178.242.49.250:15432/remote";
-    static String sccUrl = "jdbc:postgresql://178.242.49.250:15432/smartcooling_db";
+    static String rmUrl = "jdbc:postgresql://192.168.50.180:5432/remote";
+    static String sccUrl = "jdbc:postgresql://192.168.50.137:32101/postgresdb";
 
 
     static Connection rmConnection = null;
@@ -33,7 +33,7 @@ public class Starter {
 
     static Integer systemUserId=1;
     static Integer defaultMaintainer=4;
-    static Integer defaultCustomer=2;
+    static Integer defaultCustomer=59233;
     static Integer defaultMaintenanceArea=1;
 
     public static void main(String[] args) throws SQLException {
@@ -87,6 +87,7 @@ public class Starter {
 
             createSequence();
 
+            createDefaultCompany();
             createSystemUser();
 //            if(System.getProperty("devicemodel")!=null && System.getProperty("devicemodel").equals("true"))
 //            {
@@ -113,10 +114,10 @@ public class Starter {
             System.out.println("success");
         }
         catch (SQLException e) {
-            System.err.println("SQLState: " + e.getSQLState());
-            System.err.println("Error Code: " + e.getErrorCode());
-            System.err.println("Message: " + e.getMessage());
-            e.printStackTrace(System.err);
+            System.out.println("SQLState: " + e.getSQLState());
+            System.out.println("Error Code: " + e.getErrorCode());
+            System.out.println("Message: " + e.getMessage());
+            e.printStackTrace(System.out);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParseException e) {
@@ -127,7 +128,7 @@ public class Starter {
                 sccConnection.close();
             }
             catch (SQLException e) {
-                System.err.println("The connections can not be closed.");
+                System.out.println("The connections can not be closed.");
             }
         }
 
@@ -138,8 +139,8 @@ public class Starter {
 
     private static void createSequence() throws SQLException {
         Statement sequenceStatement = sccConnection.createStatement();
-        sequenceStatement.executeQuery("DROP SEQUENCE IF EXISTS nextid;");
-        sequenceStatement.executeQuery("create sequence nextid as int start with 10000");
+        sequenceStatement.execute("DROP SEQUENCE IF EXISTS nextid;");
+        sequenceStatement.execute("create sequence nextid as int start with 10000");
     }
 
 
@@ -302,6 +303,19 @@ public class Starter {
 
     }
 
+    private static void createDefaultCompany() throws SQLException {
+
+        scc_Company company=new scc_Company();
+        company.setId(Math.toIntExact(nextId()));
+        company.setType(1);
+        company.setName("Default Company");
+        company.insert(sccConnection);
+        defaultCustomer=company.getId();
+
+
+
+    }
+
     private static void createSystemUser() throws SQLException {
         systemUserId= Math.toIntExact(nextId());
         String userQuery="INSERT INTO public.\"user\"\n" +
@@ -401,7 +415,7 @@ public class Starter {
              //controller.setSupervisorId(controllers.getInt(controllers.getInt("iddevmdl")));
              controller.insert(sccConnection);
 
-             saveAlarmsFromControllers(rmSupervisorId,controllers.getInt("iddevice"),controller.getId());
+//             saveAlarmsFromControllers(rmSupervisorId,controllers.getInt("iddevice"),controller.getId());
              newControllers.add(controller);
          }
 
@@ -766,7 +780,13 @@ public class Starter {
                 IndexRequest returnRequest = new IndexRequest("alarm-parent-index").routing(parentDocId).source(alarmrow.toString(), XContentType.JSON);
                 request.add(returnRequest);
             }
-            BulkResponse bulkResponse = Utility.getElasticSearchClient().bulk(request, RequestOptions.DEFAULT);
+            try{
+                BulkResponse bulkResponse = Utility.getElasticSearchClient().bulk(request, RequestOptions.DEFAULT);
+            }
+            catch (Exception ex)
+            {
+                System.out.println(ex);
+            }
 
         }
 
@@ -785,24 +805,42 @@ public class Starter {
                 acknowledteTime= Utility.getFormattedDate(String.valueOf(childResult.getTimestamp("acknowledgetime")));
             if(childResult.getTimestamp("inhibittime")!=null && !childResult.getTimestamp("inhibittime").equals("") )
                 inhibitTime=Utility.getFormattedDate(String.valueOf(childResult.getTimestamp("inhibittime")));
-            if(childResult.getTimestamp("resolution")!=null && !childResult.getTimestamp("resolution").equals("") )
-                resolutionTime=new SimpleDateFormat(Utility.DATE_FORMAT).format(new Date(0));
+            if(childResult.getTimestamp("resolution")!=null && !childResult.getTimestamp("resolution").equals("") ) {
+                resolutionTime = new SimpleDateFormat(Utility.DATE_FORMAT).format(new Date(0));
+                resolutionMethod=childResult.getString("resolution");
+                resolutionMethod=resolutionMethod.split(";")[0];
+                if(resolutionMethod.equals("1NN"))
+                    resolutionMethod="No Action";
+                else if(resolutionMethod.equals("2LC"))
+                    resolutionMethod="Local Maintenance";
+                else if(resolutionMethod.equals("3RM"))
+                    resolutionMethod="Remote Maintenance";
+                else if(resolutionMethod.equals("4RP"))
+                    resolutionMethod="Spare Part Replacement";
+            }
+
 
 
             alarmContent.addProperty("startTime",Utility.getFormattedDate(String.valueOf(childResult.getTimestamp("starttime"))));
-            alarmContent.addProperty("endTime",Utility.getFormattedDate(String.valueOf(childResult.getTimestamp("endtime"))));
-            alarmContent.addProperty("arrivalTime",Utility.getFormattedDate(String.valueOf(childResult.getTimestamp("arrivaltime"))));
+            if(childResult.getTimestamp("endtime")!=null)
+                alarmContent.addProperty("endTime",Utility.getFormattedDate(String.valueOf(childResult.getTimestamp("endtime"))));
+            if(childResult.getTimestamp("arrivaltime")!=null)
+                alarmContent.addProperty("arrivalTime",Utility.getFormattedDate(String.valueOf(childResult.getTimestamp("arrivaltime"))));
 
                 alarmContent.addProperty("acknowledge", (acknowledteTime!=null));
-            alarmContent.addProperty("acknowledgeTime",acknowledteTime);
+            if(acknowledteTime!=null)
+                alarmContent.addProperty("acknowledgeTime",acknowledteTime);
             alarmContent.addProperty("inhibit",(inhibitTime!=null));
-            alarmContent.addProperty("inhibitTime",inhibitTime);
+            if(inhibitTime!=null)
+                alarmContent.addProperty("inhibitTime",inhibitTime);
 
             alarmContent.addProperty("resolution",(resolutionTime!=null));
-            alarmContent.addProperty("resolvedBy",systemUserId.toString());
-            alarmContent.addProperty("resolutionTime",resolutionTime);
             if(resolutionTime!=null)
+            {
+                alarmContent.addProperty("resolutionTime",resolutionTime);
+                alarmContent.addProperty("resolvedBy",systemUserId.toString());
                 alarmContent.addProperty("resolutionMethod",resolutionMethod);
+            }
 
             return alarmContent;
         }

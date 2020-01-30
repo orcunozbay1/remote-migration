@@ -113,7 +113,7 @@ public class scc_Company {
         insertPrepared.setString(7,this.fax);//user
         insertPrepared.setString(8,this.phone);//user
         insertPrepared.setString(9,this.name);//user
-        insertPrepared.setInt(10,this.createdById);//user
+        insertPrepared.setObject(10,this.createdById);//user
         insertPrepared.executeUpdate();
 
 

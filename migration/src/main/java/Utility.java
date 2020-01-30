@@ -10,8 +10,8 @@ import java.util.TimeZone;
 
 public class Utility {
 
-    public static final String ES_IP_ADDR = "178.242.49.250";
-    public static final Integer ES_PORT = 19200;
+    public static final String ES_IP_ADDR = "192.168.50.137";
+    public static final Integer ES_PORT = 31323;
     public static final String ES_PROTOCOL = "http";
 
     public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
@@ -29,6 +29,8 @@ public class Utility {
     }
 
     public static String getFormattedDate(String dateString) throws ParseException {
+        if(dateString==null)
+            return dateString;
         //2019-07-17 23:45:27
         SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZZ");
